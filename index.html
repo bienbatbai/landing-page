@@ -2,124 +2,119 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reward Video Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Watch & Earn $1</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      text-align: center;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 20px;
     }
-    #rewardMessage {
+    .video-wrapper {
+      position: relative;
+      max-width: 560px;
+      width: 100%;
+    }
+    iframe {
+      width: 100%;
+      height: 315px;
+      border: none;
+      pointer-events: none;
+    }
+    .unmute-button {
       display: none;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      background: #ff5722;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .reward {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      background: #d4edda;
+      padding: 10px 20px;
+      border: 2px solid #28a745;
+      border-radius: 10px;
+      margin-top: 20px;
+      font-weight: bold;
+      color: #155724;
+    }
+    .reward img {
+      width: 24px;
+      margin-right: 8px;
+    }
+    .countdown {
+      margin-top: 10px;
       font-size: 20px;
       font-weight: bold;
-      color: green;
-      margin-top: 20px;
     }
-    #unmuteButton {
-      display: none;
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-    #countdown {
-      font-size: 18px;
-      margin-top: 10px;
-      color: #555;
-    }
-    img {
-      width: 100%;
-      max-width: 600px;
+    img.preview-image {
+      max-width: 100%;
       border-radius: 16px;
-      margin-bottom: 20px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
+  <h2>🎥 Watch & Earn $1</h2>
 
-  <!-- Ảnh sexy phía trên video -->
-  <img src="nguoi-dep.jpg" alt="Sexy girl" />
+  <div class="video-wrapper">
+    <iframe id="ytplayer" src="https://www.youtube.com/embed/5d0lbdl58ME?autoplay=1&mute=1&controls=0&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <button id="unmuteBtn" class="unmute-button">🔊 Unmute</button>
+  </div>
 
-  <!-- Video YouTube -->
-  <div id="player"></div>
+  <div class="countdown">⏳ Please wait 30 seconds...</div>
+  <div class="reward" style="display:none;">
+    <img src="https://cdn-icons-png.flaticon.com/512/189/189101.png" width="24" /> You earned $1!
+  </div>
 
-  <!-- Nút bật tiếng -->
-  <button id="unmuteButton">🔊 Unmute</button>
+  <img class="preview-image" src="nguoi-dep.jpg" alt="Hot girl" />
 
-  <!-- Đếm ngược -->
-  <div id="countdown"></div>
-
-  <!-- Thông báo thưởng -->
-  <div id="rewardMessage">💰 You earned $1 reward after 30s of watching!</div>
-
-  <!-- Script YouTube -->
   <script>
-    var player;
-    var watchTime = 0;
-    var interval;
-    var countdownTime = 30;
+    const unmuteBtn = document.getElementById('unmuteBtn');
+    const rewardBox = document.querySelector('.reward');
+    const countdownText = document.querySelector('.countdown');
 
-    // Chặn back nhẹ nhàng
-    window.onbeforeunload = function () {
-      return "Are you sure you want to leave? Your reward will be lost.";
-    };
-
-    // Load API YouTube
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('player', {
-        height: '315',
-        width: '560',
-        videoId: '5d0lbdl58ME', // Thay đổi ID tại đây nếu cần
-        playerVars: {
-          autoplay: 1,
-          controls: 0,
-          rel: 0,
-          modestbranding: 1,
-          mute: 1
-        },
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
-        }
-      });
-    }
-
-    function onPlayerReady(event) {
-      event.target.playVideo();
-      setTimeout(() => {
-        document.getElementById('unmuteButton').style.display = 'inline-block';
-      }, 5000);
-    }
-
-    function onPlayerStateChange(event) {
-      if (event.data == YT.PlayerState.PLAYING && !interval) {
-        interval = setInterval(() => {
-          watchTime++;
-          let remaining = countdownTime - watchTime;
-          if (remaining > 0) {
-            document.getElementById('countdown').innerText = `⏳ Reward in ${remaining}s...`;
-          } else {
-            clearInterval(interval);
-            document.getElementById('rewardMessage').style.display = 'block';
-            document.getElementById('countdown').innerText = '';
-          }
-        }, 1000);
+    let timeLeft = 30;
+    const countdown = setInterval(() => {
+      timeLeft--;
+      countdownText.textContent = `⏳ Please wait ${timeLeft} seconds...`;
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        countdownText.style.display = 'none';
+        rewardBox.style.display = 'flex';
       }
-    }
+    }, 1000);
 
-    document.getElementById('unmuteButton').addEventListener('click', function () {
-      player.unMute();
-      this.style.display = 'none';
+    setTimeout(() => {
+      unmuteBtn.style.display = 'block';
+    }, 5000);
+
+    unmuteBtn.addEventListener('click', () => {
+      const iframe = document.getElementById('ytplayer');
+      iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+      unmuteBtn.style.display = 'none';
+    });
+
+    window.addEventListener('beforeunload', function (e) {
+      e.preventDefault();
+      e.returnValue = 'Are you sure you want to leave? You may lose your reward!';
     });
   </script>
 
+  <!-- Firebase Script Placeholder -->
+  <!-- You can insert Firebase SDK + tracking code below this line -->
+
 </body>
 </html>
+
 
