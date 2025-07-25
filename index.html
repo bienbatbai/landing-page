@@ -1,17 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Watch and Earn $1</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Earn $1 Watching Video</title>
   <style>
     body {
       margin: 0;
-      background-color: #000;
       font-family: Arial, sans-serif;
+      background-color: black;
       color: white;
       overflow: hidden;
+      position: relative;
     }
+
+    .background-image {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
     .reward-banner {
       position: absolute;
       top: 10px;
@@ -25,87 +49,82 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      z-index: 10;
+      z-index: 2;
     }
+
     .reward-banner img {
       width: 20px;
       height: 20px;
     }
-    .video-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+
     .countdown {
       position: absolute;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.6);
       padding: 10px 20px;
       border-radius: 20px;
       font-size: 18px;
+      z-index: 2;
     }
+
     .notice {
       display: none;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.9);
+      background: white;
       color: black;
       padding: 20px 30px;
       border-radius: 10px;
       font-size: 20px;
       text-align: center;
+      z-index: 2;
     }
   </style>
 </head>
 <body>
+
+  <!-- Hình gái xinh nền -->
+  <img class="background-image" src="https://cdn.glitch.global/2fc8013b-0e1a-4ee0-ae27-d3ff28a72f71/nguoi-dep-chan-dai-khoe-dang-sexy-tren-giuong-ngu-6a14d7.jpg?v=1690000000000" alt="girl-bg" />
+
   <div class="reward-banner">
-    <img src="https://cdn-icons-png.flaticon.com/512/3208/3208728.png" alt="Money Bag">
+    <img src="https://cdn-icons-png.flaticon.com/512/3208/3208728.png" alt="money" />
     Earn $1 if you watch 30s
   </div>
 
   <div class="video-container">
-    <iframe
-      id="video"
-      allow="autoplay; encrypted-media"
-      allowfullscreen
-    ></iframe>
+    <iframe id="video" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-    <div class="countdown" id="countdown">Time left: 30s</div>
+    <div class="countdown" id="countdown">Countdown: What will the girl do after 30s?</div>
     <div class="notice" id="notice">✅ You earned $1!</div>
   </div>
 
   <script>
-    // Đọc video ID từ URL: ?v=VIDEO_ID
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoId = urlParams.get('v') || 'DJzEyj8xjeg'; // fallback nếu không có ID
+    // Lấy video ID từ ?v=...
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get('v') || 'DJzEyj8xjeg'; // fallback
 
     const iframe = document.getElementById('video');
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&enablejsapi=1`;
 
-    // Đếm ngược 30 giây
     let secondsLeft = 30;
     const countdown = document.getElementById('countdown');
     const notice = document.getElementById('notice');
-    const interval = setInterval(() => {
+
+    const timer = setInterval(() => {
       secondsLeft--;
-      countdown.textContent = `Time left: ${secondsLeft}s`;
+      countdown.textContent = `Countdown: What will the girl do after ${secondsLeft}s?`;
       if (secondsLeft <= 0) {
-        clearInterval(interval);
+        clearInterval(timer);
         countdown.style.display = 'none';
         notice.style.display = 'block';
       }
     }, 1000);
 
-    // Cảnh báo khi người dùng cố rời trang
+    // Ngăn người dùng rời trang
     window.addEventListener("beforeunload", function (e) {
       e.preventDefault();
       e.returnValue = '';
