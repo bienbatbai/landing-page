@@ -1,91 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎁 Watch & Earn</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reward Video Page</title>
   <style>
-    body { text-align: center; font-family: Arial, sans-serif; margin: 30px; }
-    #unmuteBtn { margin-top: 10px; padding: 10px 20px; font-size: 16px; display: none; }
-    #reward { font-size: 24px; color: green; margin-top: 20px; display: none; }
-    #countdown { font-size: 22px; color: orange; margin-top: 20px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      text-align: center;
+      padding: 20px;
+    }
+    #rewardMessage {
+      display: none;
+      font-size: 20px;
+      font-weight: bold;
+      color: green;
+      margin-top: 20px;
+    }
+    #unmuteButton {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #countdown {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #555;
+    }
+    img {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
-  <h2>🔥 Stay 30 seconds to unlock your surprise 🔥</h2>
 
-  <div>
-    <iframe id="videoFrame"
-      width="560" height="315"
-      src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1"
-      title="YouTube video player"
-      frameborder="0"
-      allow="autoplay; encrypted-media"
-      allowfullscreen>
-    </iframe>
-  </div>
+  <!-- Ảnh sexy phía trên video -->
+  <img src="nguoi-dep.jpg" alt="Sexy girl" />
 
-  <button id="unmuteBtn">🔊 Unmute Video</button>
-  <div id="countdown">🎁 Watching... 30 seconds left</div>
-  <div id="reward">💰 You unlocked $1 reward!</div>
+  <!-- Video YouTube -->
+  <div id="player"></div>
 
+  <!-- Nút bật tiếng -->
+  <button id="unmuteButton">🔊 Unmute</button>
+
+  <!-- Đếm ngược -->
+  <div id="countdown"></div>
+
+  <!-- Thông báo thưởng -->
+  <div id="rewardMessage">💰 You earned $1 reward after 30s of watching!</div>
+
+  <!-- Script YouTube -->
   <script>
-    // Show unmute button after 5 seconds
-    setTimeout(() => {
-      document.getElementById('unmuteBtn').style.display = 'inline-block';
-    }, 5000);
+    var player;
+    var watchTime = 0;
+    var interval;
+    var countdownTime = 30;
 
-    document.getElementById('unmuteBtn').onclick = () => {
-      const iframe = document.getElementById("videoFrame");
-      const src = iframe.src.replace("mute=1", "mute=0");
-      iframe.src = src;
-      document.getElementById('unmuteBtn').style.display = 'none';
-    };
-
-    // Countdown logic
-    let seconds = 30;
-    const countdown = document.getElementById("countdown");
-    const reward = document.getElementById("reward");
-
-    const timer = setInterval(() => {
-      seconds--;
-      countdown.innerText = `🎁 Watching... ${seconds} seconds left`;
-      if (seconds <= 0) {
-        clearInterval(timer);
-        countdown.style.display = "none";
-        reward.style.display = "block";
-        // Save to Firebase
-        saveView();
-      }
-    }, 1000);
-
-    // Warn on leaving page
+    // Chặn back nhẹ nhàng
     window.onbeforeunload = function () {
-      return "Are you sure you want to leave? You may lose your reward.";
+      return "Are you sure you want to leave? Your reward will be lost.";
     };
-  </script>
 
-  <!-- Firebase integration -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "YOUR_KEY",
-      authDomain: "YOUR_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_BUCKET",
-      messagingSenderId: "YOUR_ID",
-      appId: "YOUR_APP_ID"
-    };
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(app);
+    // Load API YouTube
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    function saveView() {
-      db.collection("viewers").add({
-        viewedAt: new Date().toISOString()
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '315',
+        width: '560',
+        videoId: '5d0lbdl58ME', // Thay đổi ID tại đây nếu cần
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          mute: 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
       });
     }
+
+    function onPlayerReady(event) {
+      event.target.playVideo();
+      setTimeout(() => {
+        document.getElementById('unmuteButton').style.display = 'inline-block';
+      }, 5000);
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data == YT.PlayerState.PLAYING && !interval) {
+        interval = setInterval(() => {
+          watchTime++;
+          let remaining = countdownTime - watchTime;
+          if (remaining > 0) {
+            document.getElementById('countdown').innerText = `⏳ Reward in ${remaining}s...`;
+          } else {
+            clearInterval(interval);
+            document.getElementById('rewardMessage').style.display = 'block';
+            document.getElementById('countdown').innerText = '';
+          }
+        }, 1000);
+      }
+    }
+
+    document.getElementById('unmuteButton').addEventListener('click', function () {
+      player.unMute();
+      this.style.display = 'none';
+    });
   </script>
+
 </body>
 </html>
 
