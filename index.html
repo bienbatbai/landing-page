@@ -68,7 +68,7 @@
   <h2>🎥 Watch & Earn $1</h2>
 
   <div class="video-wrapper">
-    <iframe id="ytplayer" src="https://www.youtube.com/embed/5d0lbdl58ME?autoplay=1&mute=1&controls=0&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <iframe id="ytplayer" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     <button id="unmuteBtn" class="unmute-button">🔊 Unmute</button>
   </div>
 
@@ -80,6 +80,13 @@
   <img class="preview-image" src="nguoi-dep.jpg" alt="Hot girl" />
 
   <script>
+    // Lấy ID từ URL ?v=
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get('v') || '5d0lbdl58ME'; // mặc định nếu không có ?v=
+
+    const iframe = document.getElementById('ytplayer');
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&enablejsapi=1`;
+
     const unmuteBtn = document.getElementById('unmuteBtn');
     const rewardBox = document.querySelector('.reward');
     const countdownText = document.querySelector('.countdown');
@@ -100,7 +107,6 @@
     }, 5000);
 
     unmuteBtn.addEventListener('click', () => {
-      const iframe = document.getElementById('ytplayer');
       iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
       unmuteBtn.style.display = 'none';
     });
