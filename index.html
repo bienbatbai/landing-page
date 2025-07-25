@@ -1,53 +1,73 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Video Quảng Cáo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎥 Watch & Earn</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       text-align: center;
-      background-color: #f9f9f9;
-      padding: 50px;
+      font-family: Arial, sans-serif;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 20px;
+      color: #ff5500;
+    }
+    .warning {
+      margin-top: 10px;
+      color: red;
     }
     iframe {
       margin-top: 20px;
-      border-radius: 12px;
-      max-width: 90%;
+      width: 90%;
+      max-width: 560px;
       height: 315px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      border: none;
     }
-    .error {
-      color: red;
+    #reward {
+      display: none;
+      margin-top: 30px;
+      font-size: 20px;
+      color: #2b8a3e;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>🔥surprise will come after 30s  🔥</h1>
+
+  <h1>🔥 Stay 30 seconds to unlock your surprise 🔥</h1>
+  <p class="warning">⚠️ No video found! Please add <strong>?v=VIDEO_ID</strong> to the URL</p>
+
   <div id="video-container"></div>
 
+  <div id="reward">💰 Congratulations! You earned <strong>$1</strong> for watching 30 seconds!</div>
+
   <script>
+    // Get video ID from URL (?v=VIDEO_ID)
     const params = new URLSearchParams(window.location.search);
     const videoId = params.get("v");
 
-    const container = document.getElementById("video-container");
-
     if (videoId) {
       const iframe = document.createElement("iframe");
-      iframe.width = "560";
-      iframe.height = "315";
-      iframe.src = `https://www.youtube.com/embed/${videoId}`;
-      iframe.frameBorder = "0";
-      iframe.allow =
-        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&modestbranding=1`;
+      iframe.allow = "autoplay; encrypted-media";
       iframe.allowFullscreen = true;
-      container.appendChild(iframe);
-    } else {
-      container.innerHTML = '<p class="error">⚠️ Không tìm thấy video! Hãy thêm ?v=ID vào URL.</p>';
+      document.getElementById("video-container").appendChild(iframe);
     }
+
+    // Show reward after 30 seconds
+    setTimeout(() => {
+      document.getElementById("reward").style.display = "block";
+    }, 30000);
+
+    // Warn user before leaving the page
+    window.onbeforeunload = function () {
+      return "Wait! You might miss your $1 reward.";
+    };
   </script>
+
 </body>
 </html>
-
