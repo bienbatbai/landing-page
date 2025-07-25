@@ -1,73 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎥 Watch & Earn</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎁 Watch & Earn</title>
   <style>
-    body {
-      text-align: center;
-      font-family: Arial, sans-serif;
-      background: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    h1 {
-      margin-top: 20px;
-      color: #ff5500;
-    }
-    .warning {
-      margin-top: 10px;
-      color: red;
-    }
-    iframe {
-      margin-top: 20px;
-      width: 90%;
-      max-width: 560px;
-      height: 315px;
-      border: none;
-    }
-    #reward {
-      display: none;
-      margin-top: 30px;
-      font-size: 20px;
-      color: #2b8a3e;
-      font-weight: bold;
-    }
+    body { text-align: center; font-family: Arial, sans-serif; margin: 30px; }
+    #unmuteBtn { margin-top: 10px; padding: 10px 20px; font-size: 16px; display: none; }
+    #reward { font-size: 24px; color: green; margin-top: 20px; display: none; }
+    #countdown { font-size: 22px; color: orange; margin-top: 20px; }
   </style>
 </head>
 <body>
+  <h2>🔥 Stay 30 seconds to unlock your surprise 🔥</h2>
 
-  <h1>🔥 Stay 30 seconds to unlock your surprise 🔥</h1>
-  <p class="warning">⚠️ No video found! Please add <strong>?v=VIDEO_ID</strong> to the URL</p>
+  <div>
+    <iframe id="videoFrame"
+      width="560" height="315"
+      src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1"
+      title="YouTube video player"
+      frameborder="0"
+      allow="autoplay; encrypted-media"
+      allowfullscreen>
+    </iframe>
+  </div>
 
-  <div id="video-container"></div>
-
-  <div id="reward">💰 Congratulations! You earned <strong>$1</strong> for watching 30 seconds!</div>
+  <button id="unmuteBtn">🔊 Unmute Video</button>
+  <div id="countdown">🎁 Watching... 30 seconds left</div>
+  <div id="reward">💰 You unlocked $1 reward!</div>
 
   <script>
-    // Get video ID from URL (?v=VIDEO_ID)
-    const params = new URLSearchParams(window.location.search);
-    const videoId = params.get("v");
-
-    if (videoId) {
-      const iframe = document.createElement("iframe");
-      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&modestbranding=1`;
-      iframe.allow = "autoplay; encrypted-media";
-      iframe.allowFullscreen = true;
-      document.getElementById("video-container").appendChild(iframe);
-    }
-
-    // Show reward after 30 seconds
+    // Show unmute button after 5 seconds
     setTimeout(() => {
-      document.getElementById("reward").style.display = "block";
-    }, 30000);
+      document.getElementById('unmuteBtn').style.display = 'inline-block';
+    }, 5000);
 
-    // Warn user before leaving the page
+    document.getElementById('unmuteBtn').onclick = () => {
+      const iframe = document.getElementById("videoFrame");
+      const src = iframe.src.replace("mute=1", "mute=0");
+      iframe.src = src;
+      document.getElementById('unmuteBtn').style.display = 'none';
+    };
+
+    // Countdown logic
+    let seconds = 30;
+    const countdown = document.getElementById("countdown");
+    const reward = document.getElementById("reward");
+
+    const timer = setInterval(() => {
+      seconds--;
+      countdown.innerText = `🎁 Watching... ${seconds} seconds left`;
+      if (seconds <= 0) {
+        clearInterval(timer);
+        countdown.style.display = "none";
+        reward.style.display = "block";
+        // Save to Firebase
+        saveView();
+      }
+    }, 1000);
+
+    // Warn on leaving page
     window.onbeforeunload = function () {
-      return "Wait! You might miss your $1 reward.";
+      return "Are you sure you want to leave? You may lose your reward.";
     };
   </script>
 
+  <!-- Firebase integration -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_KEY",
+      authDomain: "YOUR_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_BUCKET",
+      messagingSenderId: "YOUR_ID",
+      appId: "YOUR_APP_ID"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(app);
+
+    function saveView() {
+      db.collection("viewers").add({
+        viewedAt: new Date().toISOString()
+      });
+    }
+  </script>
 </body>
 </html>
+
