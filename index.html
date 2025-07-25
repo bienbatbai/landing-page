@@ -1,21 +1,53 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Video Quảng Cáo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f9f9f9;
+      padding: 50px;
+    }
+    iframe {
+      margin-top: 20px;
+      border-radius: 12px;
+      max-width: 90%;
+      height: 315px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
 </head>
-<body style="text-align: center; font-family: Arial, sans-serif; background: #f9f9f9;">
-  <h1>🔥 Video Đang Gây Sốt 🔥</h1>
-  <p>Hãy xem ngay video bên dưới để không bỏ lỡ!</p>
-  
-  <iframe width="560" height="315"
-    src="https://www.youtube.com/embed/DJzEyj8xjeg?si=XPmPDFg4oI5os4Cr"
-    title="YouTube video player"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-    allowfullscreen
-    style="margin-top: 20px; border-radius: 12px;">
-  </iframe>
+<body>
+  <h1>🔥surprise will come after 30s  🔥</h1>
+  <div id="video-container"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get("v");
+
+    const container = document.getElementById("video-container");
+
+    if (videoId) {
+      const iframe = document.createElement("iframe");
+      iframe.width = "560";
+      iframe.height = "315";
+      iframe.src = `https://www.youtube.com/embed/${videoId}`;
+      iframe.frameBorder = "0";
+      iframe.allow =
+        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      iframe.allowFullscreen = true;
+      container.appendChild(iframe);
+    } else {
+      container.innerHTML = '<p class="error">⚠️ Không tìm thấy video! Hãy thêm ?v=ID vào URL.</p>';
+    }
+  </script>
 </body>
 </html>
+
