@@ -11,33 +11,10 @@
       background-color: black;
       color: white;
       overflow: hidden;
-      position: relative;
-    }
-
-    .background-image {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-      opacity: 0.4;
-    }
-
-    .video-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      z-index: 1;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
     }
 
     .reward-banner {
-      position: absolute;
+      position: fixed;
       top: 10px;
       left: 50%;
       transform: translateX(-50%);
@@ -49,7 +26,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      z-index: 2;
+      z-index: 3;
     }
 
     .reward-banner img {
@@ -57,21 +34,41 @@
       height: 20px;
     }
 
+    .video-container {
+      width: 100%;
+      height: 70vh;
+      position: relative;
+      z-index: 2;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .image-below {
+      width: 100%;
+      height: 30vh;
+      object-fit: cover;
+      z-index: 1;
+    }
+
     .countdown {
       position: absolute;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
       padding: 10px 20px;
       border-radius: 20px;
       font-size: 18px;
-      z-index: 2;
+      z-index: 3;
     }
 
     .notice {
       display: none;
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -81,32 +78,31 @@
       border-radius: 10px;
       font-size: 20px;
       text-align: center;
-      z-index: 2;
+      z-index: 4;
     }
   </style>
 </head>
 <body>
 
-  <!-- Hình gái xinh nền -->
-  <img class="background-image" src="https://cdn.glitch.global/2fc8013b-0e1a-4ee0-ae27-d3ff28a72f71/nguoi-dep-chan-dai-khoe-dang-sexy-tren-giuong-ngu-6a14d7.jpg?v=1690000000000" alt="girl-bg" />
-
+  <!-- Banner phần thưởng -->
   <div class="reward-banner">
     <img src="https://cdn-icons-png.flaticon.com/512/3208/3208728.png" alt="money" />
     Earn $1 if you watch 30s
   </div>
 
+  <!-- Video -->
   <div class="video-container">
     <iframe id="video" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-
     <div class="countdown" id="countdown">Countdown: What will the girl do after 30s?</div>
     <div class="notice" id="notice">✅ You earned $1!</div>
   </div>
 
-  <script>
-    // Lấy video ID từ ?v=...
-    const params = new URLSearchParams(window.location.search);
-    const videoId = params.get('v') || 'DJzEyj8xjeg'; // fallback
+  <!-- Hình gái xinh bên dưới video -->
+  <img class="image-below" src="https://cdn.glitch.global/2fc8013b-0e1a-4ee0-ae27-d3ff28a72f71/nguoi-dep-chan-dai-khoe-dang-sexy-tren-giuong-ngu-6a14d7.jpg?v=1690000000000" alt="sexy girl" />
 
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get('v') || 'DJzEyj8xjeg';
     const iframe = document.getElementById('video');
     iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&enablejsapi=1`;
 
@@ -124,7 +120,6 @@
       }
     }, 1000);
 
-    // Ngăn người dùng rời trang
     window.addEventListener("beforeunload", function (e) {
       e.preventDefault();
       e.returnValue = '';
@@ -132,6 +127,7 @@
   </script>
 </body>
 </html>
+
 
 
 
