@@ -95,6 +95,7 @@
 
 <!-- YouTube API -->
 <script>
+  // Get video ID from URL ?v=XXXX
   const params = new URLSearchParams(window.location.search);
   const videoId = params.get("v") || "dQw4w9WgXcQ"; // Default fallback
 
@@ -116,29 +117,23 @@
         rel: 0
       },
       events: {
-        onReady: () => {
-          player.playVideo();
-
-          // 🔈 Sau 5 giây bật tiếng
-          setTimeout(() => {
-            player.unMute();
-          }, 5000);
-        }
+        onReady: () => player.playVideo()
       }
     });
   }
 
+  // Make sure API is loaded before using
   window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
   loadYouTubeAPI();
 
-  // Countdown
+  // Countdown logic
   let seconds = 30;
   const countdownEl = document.querySelector(".countdown");
   const continueBtn = document.querySelector(".continue-btn");
 
   const timer = setInterval(() => {
     seconds--;
-    countdownEl.textContent = `⏳ Please watch for ${seconds} more second${seconds === 1 ? '' : 's'}...`;
+    countdownEl.textContent = ⏳ Please watch for ${seconds} more second${seconds === 1 ? '' : 's'}...;
     if (seconds <= 0) {
       clearInterval(timer);
       countdownEl.style.display = "none";
