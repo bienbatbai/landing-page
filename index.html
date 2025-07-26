@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Video Hot Surprise After 30s</title>
+  <title>Watch Video to Unlock</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -23,21 +23,31 @@
       text-align: center;
     }
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-
     .video-wrapper {
       position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
       margin: 0 auto;
+      background: #000;
     }
 
     #player {
       width: 100%;
       height: 100%;
+    }
+
+    .unmute-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+      z-index: 2;
     }
 
     .countdown {
@@ -68,63 +78,65 @@
       padding: 20px;
       border-radius: 12px;
     }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 20px;
-      }
-    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>🎬 Watch This Video</h1>
+  <h1>🎬 Watch This Video to Continue</h1>
 
   <div class="video-wrapper">
     <div id="player"></div>
+    <button class="unmute-btn" onclick="unmuteVideo()">🔊 Unmute</button>
   </div>
 
   <div class="countdown">⏳ Please watch for at least 30 seconds...</div>
   <button class="continue-btn" onclick="alert('You may now continue!')">Continue</button>
 
   <div class="info-box">
-    ℹ️ This video is embedded directly from YouTube. No personal data is collected.
+    ℹ️ This video is embedded from YouTube. No personal data is collected.
   </div>
 </div>
 
-<!-- YouTube API -->
 <script>
-  // Get video ID from URL ?v=XXXX
   const params = new URLSearchParams(window.location.search);
-  const videoId = params.get("v") || "dQw4w9WgXcQ"; // Default fallback
+  const videoId = params.get("v") || "dQw4w9WgXcQ";
 
   let player;
+
   function loadYouTubeAPI() {
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.body.appendChild(tag);
   }
 
-  function onYouTubeIframeAPIReady() {
+  window.onYouTubeIframeAPIReady = function() {
     player = new YT.Player("player", {
       videoId: videoId,
       playerVars: {
         autoplay: 1,
         mute: 1,
-        controls: 1,
+        controls: 0,
         modestbranding: 1,
-        rel: 0
+        rel: 0,
+        disablekb: 1
       },
       events: {
-        onReady: () => player.playVideo()
+        onReady: () => {
+          player.playVideo();
+          // Show unmute button after 5s
+          setTimeout(() => {
+            document.querySelector(".unmute-btn").style.display = "block";
+          }, 5000);
+        }
       }
     });
   }
 
-  // Make sure API is loaded before using
-  window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
-  loadYouTubeAPI();
+  function unmuteVideo() {
+    player.unMute();
+    document.querySelector(".unmute-btn").style.display = "none";
+  }
 
   // Countdown logic
   let seconds = 30;
@@ -140,8 +152,9 @@
       continueBtn.style.display = "inline-block";
     }
   }, 1000);
+
+  loadYouTubeAPI();
 </script>
 
 </body>
 </html>
-
