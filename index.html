@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Khám Phá Video Hấp Dẫn</title>
+  <title>Watch This Video</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -50,7 +50,7 @@
       display: none;
       margin-top: 20px;
       padding: 12px 24px;
-      background-color: #28a745;
+      background-color: #007bff;
       color: white;
       border: none;
       font-size: 16px;
@@ -59,7 +59,7 @@
     }
 
     .continue-btn:hover {
-      background-color: #218838;
+      background-color: #0056b3;
     }
 
     .info-box {
@@ -79,26 +79,32 @@
 <body>
 
 <div class="container">
-  <h1>🎬 Xem Video Hấp Dẫn Nhất Hôm Nay</h1>
+  <h1>🎬 Watch This Video</h1>
 
   <div class="video-wrapper">
     <div id="player"></div>
   </div>
 
-  <div class="countdown">⏳ Vui lòng xem ít nhất 30 giây...</div>
-  <button class="continue-btn" onclick="alert('Bạn có thể tiếp tục!')">Tiếp tục</button>
+  <div class="countdown">⏳ Please watch for at least 30 seconds...</div>
+  <button class="continue-btn" onclick="alert('You may now continue!')">Continue</button>
 
   <div class="info-box">
-    ⓘ Trang này hiển thị video công khai từ YouTube. Chúng tôi không lưu dữ liệu cá nhân nào.  
+    ℹ️ This video is embedded directly from YouTube. No personal data is collected.
   </div>
 </div>
 
 <!-- YouTube API -->
-<script src="https://www.youtube.com/iframe_api"></script>
 <script>
-  let player;
+  // Get video ID from URL ?v=XXXX
   const params = new URLSearchParams(window.location.search);
-  const videoId = params.get("v") || "5d0lbdl58ME";
+  const videoId = params.get("v") || "dQw4w9WgXcQ"; // Default fallback
+
+  let player;
+  function loadYouTubeAPI() {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+  }
 
   function onYouTubeIframeAPIReady() {
     player = new YT.Player("player", {
@@ -116,14 +122,18 @@
     });
   }
 
-  // Countdown
+  // Make sure API is loaded before using
+  window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+  loadYouTubeAPI();
+
+  // Countdown logic
   let seconds = 30;
   const countdownEl = document.querySelector(".countdown");
   const continueBtn = document.querySelector(".continue-btn");
 
   const timer = setInterval(() => {
     seconds--;
-    countdownEl.textContent = `⏳ Vui lòng xem thêm ${seconds} giây...`;
+    countdownEl.textContent = `⏳ Please watch for ${seconds} more second${seconds === 1 ? '' : 's'}...`;
     if (seconds <= 0) {
       clearInterval(timer);
       countdownEl.style.display = "none";
@@ -134,3 +144,4 @@
 
 </body>
 </html>
+
