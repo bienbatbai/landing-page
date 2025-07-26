@@ -1,128 +1,136 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Watch & Earn $1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Khám Phá Video Hấp Dẫn</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #fff;
+      color: #333;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
     }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
     .video-wrapper {
       position: relative;
-      max-width: 560px;
       width: 100%;
+      aspect-ratio: 16 / 9;
+      margin: 0 auto;
     }
-    iframe {
+
+    #player {
       width: 100%;
-      height: 315px;
-      border: none;
-      pointer-events: none;
+      height: 100%;
     }
-    .unmute-button {
+
+    .countdown {
+      font-size: 18px;
+      margin-top: 16px;
+      color: #555;
+    }
+
+    .continue-btn {
       display: none;
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      padding: 10px 20px;
-      background: #ff5722;
-      color: #fff;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background-color: #28a745;
+      color: white;
       border: none;
+      font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
     }
-    .reward {
-      display: flex;
-      align-items: center;
-      font-size: 18px;
-      background: #d4edda;
-      padding: 10px 20px;
-      border: 2px solid #28a745;
-      border-radius: 10px;
-      margin-top: 20px;
-      font-weight: bold;
-      color: #155724;
+
+    .continue-btn:hover {
+      background-color: #218838;
     }
-    .reward img {
-      width: 24px;
-      margin-right: 8px;
+
+    .info-box {
+      margin-top: 30px;
+      background: #f1f1f1;
+      padding: 20px;
+      border-radius: 12px;
     }
-    .countdown {
-      margin-top: 10px;
-      font-size: 20px;
-      font-weight: bold;
-    }
-    img.preview-image {
-      max-width: 100%;
-      border-radius: 16px;
-      margin-top: 20px;
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>🎥 Watch & Earn $1</h2>
+
+<div class="container">
+  <h1>🎬 Xem Video Hấp Dẫn Nhất Hôm Nay</h1>
 
   <div class="video-wrapper">
-    <iframe id="ytplayer" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-    <button id="unmuteBtn" class="unmute-button">🔊 Unmute</button>
+    <div id="player"></div>
   </div>
 
-  <div class="countdown">⏳ Please wait 30 seconds...</div>
-  <div class="reward" style="display:none;">
-    <img src="https://cdn-icons-png.flaticon.com/512/189/189101.png" width="24" /> You earned $1!
+  <div class="countdown">⏳ Vui lòng xem ít nhất 30 giây...</div>
+  <button class="continue-btn" onclick="alert('Bạn có thể tiếp tục!')">Tiếp tục</button>
+
+  <div class="info-box">
+    ⓘ Trang này hiển thị video công khai từ YouTube. Chúng tôi không lưu dữ liệu cá nhân nào.  
   </div>
+</div>
 
-  <img class="preview-image" src="nguoi-dep.jpg" alt="Hot girl" />
+<!-- YouTube API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+  let player;
+  const params = new URLSearchParams(window.location.search);
+  const videoId = params.get("v") || "5d0lbdl58ME";
 
-  <script>
-    // Lấy ID từ URL ?v=
-    const params = new URLSearchParams(window.location.search);
-    const videoId = params.get('v') || '5d0lbdl58ME'; // mặc định nếu không có ?v=
-
-    const iframe = document.getElementById('ytplayer');
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&enablejsapi=1`;
-
-    const unmuteBtn = document.getElementById('unmuteBtn');
-    const rewardBox = document.querySelector('.reward');
-    const countdownText = document.querySelector('.countdown');
-
-    let timeLeft = 30;
-    const countdown = setInterval(() => {
-      timeLeft--;
-      countdownText.textContent = `⏳ Please wait ${timeLeft} seconds...`;
-      if (timeLeft <= 0) {
-        clearInterval(countdown);
-        countdownText.style.display = 'none';
-        rewardBox.style.display = 'flex';
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player("player", {
+      videoId: videoId,
+      playerVars: {
+        autoplay: 1,
+        mute: 1,
+        controls: 1,
+        modestbranding: 1,
+        rel: 0
+      },
+      events: {
+        onReady: () => player.playVideo()
       }
-    }, 1000);
-
-    setTimeout(() => {
-      unmuteBtn.style.display = 'block';
-    }, 5000);
-
-    unmuteBtn.addEventListener('click', () => {
-      iframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-      unmuteBtn.style.display = 'none';
     });
+  }
 
-    window.addEventListener('beforeunload', function (e) {
-      e.preventDefault();
-      e.returnValue = 'Are you sure you want to leave? You may lose your reward!';
-    });
-  </script>
+  // Countdown
+  let seconds = 30;
+  const countdownEl = document.querySelector(".countdown");
+  const continueBtn = document.querySelector(".continue-btn");
 
-  <!-- Firebase Script Placeholder -->
-  <!-- You can insert Firebase SDK + tracking code below this line -->
+  const timer = setInterval(() => {
+    seconds--;
+    countdownEl.textContent = `⏳ Vui lòng xem thêm ${seconds} giây...`;
+    if (seconds <= 0) {
+      clearInterval(timer);
+      countdownEl.style.display = "none";
+      continueBtn.style.display = "inline-block";
+    }
+  }, 1000);
+</script>
 
 </body>
 </html>
-
-
-
-
