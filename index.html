@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Video Hot Surprise After 30s</title>
+  <title>Watch This Video</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -133,7 +133,7 @@
 
   const timer = setInterval(() => {
     seconds--;
-    countdownEl.textContent = ⏳ Please watch for ${seconds} more second${seconds === 1 ? '' : 's'}...;
+    countdownEl.textContent = `⏳ Please watch for ${seconds} more second${seconds === 1 ? '' : 's'}...`;
     if (seconds <= 0) {
       clearInterval(timer);
       countdownEl.style.display = "none";
@@ -144,4 +144,5 @@
 
 </body>
 </html>
+
 
