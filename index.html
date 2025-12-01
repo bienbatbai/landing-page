@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Watch Video</title>
+
 <style>
   body{
     font-family:Arial,Helvetica,sans-serif;
@@ -12,6 +13,7 @@
     padding:40px;
     background:#f5f6fa;
   }
+
   .box{
     max-width:720px;
     margin:0 auto;
@@ -20,6 +22,22 @@
     border-radius:14px;
     box-shadow:0 6px 18px rgba(0,0,0,.08);
   }
+
+  .headline{
+    font-size:22px;
+    font-weight:700;
+    color:#111;
+    margin-bottom:15px;
+  }
+
+  .preview-img{
+    width:100%;
+    max-width:550px;
+    border-radius:12px;
+    margin-bottom:18px;
+    box-shadow:0 5px 14px rgba(0,0,0,0.14);
+  }
+
   .btn{
     display:inline-block;
     margin-top:15px;
@@ -31,22 +49,35 @@
     font-weight:700;
     font-size:18px;
   }
+
   .note{
     margin-top:12px;
     color:#777;
   }
 </style>
 </head>
-<body>
 
+
+<body>
 <div class="box">
+
+  <!-- TIÊU ĐỀ GỢI TÒ MÒ -->
+  <div class="headline">Don't Miss This Exclusive Video!</div>
+
+  <!-- ẢNH GÂY TÒ MÒ (ảnh bạn chọn) -->
+  <img class="preview-img" src="NGUOI DEP.jpg.webp" alt="Preview Image">
+
   <h2>Watch This Video</h2>
   <p id="msg">Preparing...</p>
+
   <a id="btn" href="#" class="btn" target="_blank" rel="noopener noreferrer">
     ▶ Open on YouTube
   </a>
-  <p class="note">Hãy thêm <b>?v=VIDEOID</b> vào URL khi tạo quảng cáo.</p>
+
+  <p class="note">Add <b>?v=VIDEOID</b> to the URL when creating ads.</p>
+
 </div>
+
 
 <script>
 // Lấy tham số URL
@@ -54,19 +85,16 @@ function getParam(n){
   return new URLSearchParams(window.location.search).get(n); 
 }
 
-// Tách ID từ URL YouTube hoặc ID thuần
+// Tách ID từ URL YouTube hoặc từ ID
 function getID(v){
   if(!v) return null;
   v = v.trim();
 
-  // Nếu chỉ là ID
   if(/^[A-Za-z0-9_\-]{6,}$/.test(v)) return v;
 
-  // watch?v=
   let m = v.match(/v=([A-Za-z0-9_\-]{6,})/);
   if(m) return m[1];
 
-  // youtu.be
   m = v.match(/youtu\.be\/([A-Za-z0-9_\-]{6,})/);
   if(m) return m[1];
 
@@ -86,18 +114,17 @@ function getID(v){
     return;
   }
 
-  // Link YouTube
   const url = "https://www.youtube.com/watch?v=" + id;
 
-  // Gán nút
   btn.href = url;
-  msg.innerHTML = "Click vào nút dưới để mở video trên YouTube.";
+  msg.innerHTML = "Click the button below to open the video on YouTube.";
 
 })();
 </script>
 
 </body>
 </html>
+
 
 
 
