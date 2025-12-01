@@ -1,165 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Watch This Video</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #fff;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .container {
-      max-width: 600px;
-      width: 100%;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-
-    .video-wrapper {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      margin: 0 auto;
-    }
-
-    #player {
-      width: 100%;
-      height: 100%;
-    }
-
-    .countdown {
-      font-size: 18px;
-      margin-top: 16px;
-      color: #555;
-    }
-
-    .continue-btn {
-      display: none;
-      margin-top: 20px;
-      padding: 12px 24px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .continue-btn:hover {
-      background-color: #0056b3;
-    }
-
-    .info-box {
-      margin-top: 30px;
-      background: #f1f1f1;
-      padding: 20px;
-      border-radius: 12px;
-    }
-
-    .bottom-image {
-      margin-top: 40px;
-      width: 100%;
-      max-width: 600px;
-      border-radius: 16px;
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 20px;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Watch Video</title>
+<style>
+  body{
+    font-family:Arial,Helvetica,sans-serif;
+    text-align:center;
+    padding:40px;
+    background:#f5f6fa;
+  }
+  .box{
+    max-width:720px;
+    margin:0 auto;
+    background:#fff;
+    padding:28px;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+  }
+  .btn{
+    display:inline-block;
+    margin-top:15px;
+    padding:14px 24px;
+    background:#ff0000;
+    color:#fff;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:700;
+    font-size:18px;
+  }
+  .note{
+    margin-top:12px;
+    color:#777;
+  }
+</style>
 </head>
 <body>
 
-<div class="container">
-  <h1>🎬 Watch This Video</h1>
-
-  <div class="video-wrapper">
-    <div id="player"></div>
-  </div>
-
-  <div class="countdown">⏳ Please watch for at least 30 seconds...</div>
-  <button class="continue-btn" onclick="alert('You may now continue!')">Continue</button>
-
-  <div class="info-box">
-    ℹ️ This video is embedded directly from YouTube. No personal data is collected.
-  </div>
-
-  <!-- Bottom Image 1 -->
-  <img class="bottom-image" 
-       src="https://raw.githubusercontent.com/bienbatbai/landing-page/main/NGUOI%20DEP.jpg.webp" 
-       alt="Preview Image" />
-
-  <!-- Bottom Image 2 (mới thêm vào) -->
-  <img class="bottom-image" 
-       src="https://raw.githubusercontent.com/bienbatbai/landing-page/main/nguoi-dep2.jpg.jpg" 
-       alt="Preview Image 2" />
+<div class="box">
+  <h2>Watch This Video</h2>
+  <p id="msg">Preparing...</p>
+  <a id="btn" href="#" class="btn" target="_blank" rel="noopener noreferrer">
+    ▶ Open on YouTube
+  </a>
+  <p class="note">Hãy thêm <b>?v=VIDEOID</b> vào URL khi tạo quảng cáo.</p>
 </div>
 
-<!-- YouTube API -->
 <script>
-  // Get video ID from URL ?v=XXXX
-  const params = new URLSearchParams(window.location.search);
-  const videoId = params.get("v") || "dQw4w9WgXcQ"; // Default fallback
+// Lấy tham số URL
+function getParam(n){ 
+  return new URLSearchParams(window.location.search).get(n); 
+}
 
-  let player;
-  function loadYouTubeAPI() {
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.body.appendChild(tag);
+// Tách ID từ URL YouTube hoặc ID thuần
+function getID(v){
+  if(!v) return null;
+  v = v.trim();
+
+  // Nếu chỉ là ID
+  if(/^[A-Za-z0-9_\-]{6,}$/.test(v)) return v;
+
+  // watch?v=
+  let m = v.match(/v=([A-Za-z0-9_\-]{6,})/);
+  if(m) return m[1];
+
+  // youtu.be
+  m = v.match(/youtu\.be\/([A-Za-z0-9_\-]{6,})/);
+  if(m) return m[1];
+
+  return null;
+}
+
+(function(){
+  const raw = getParam('v');
+  const id  = getID(raw);
+
+  const btn = document.getElementById('btn');
+  const msg = document.getElementById('msg');
+
+  if(!id){
+    msg.textContent = "Không tìm thấy video. Vui lòng thêm ?v=VIDEOID vào URL.";
+    btn.style.display = "none";
+    return;
   }
 
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player("player", {
-      videoId: videoId,
-      playerVars: {
-        autoplay: 1,
-        mute: 1,
-        controls: 1,
-        modestbranding: 1,
-        rel: 0
-      },
-      events: {
-        onReady: () => player.playVideo()
-      }
-    });
-  }
+  // Link YouTube
+  const url = "https://www.youtube.com/watch?v=" + id;
 
-  // Make sure API is loaded before using
-  window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
-  loadYouTubeAPI();
+  // Gán nút
+  btn.href = url;
+  msg.innerHTML = "Click vào nút dưới để mở video trên YouTube.";
 
-  // Countdown logic
-  let seconds = 30;
-  const countdownEl = document.querySelector(".countdown");
-  const continueBtn = document.querySelector(".continue-btn");
-
-  const timer = setInterval(() => {
-    seconds--;
-    countdownEl.textContent = `⏳ Please watch for ${seconds} more second${seconds === 1 ? '' : 's'}...`;
-    if (seconds <= 0) {
-      clearInterval(timer);
-      countdownEl.style.display = "none";
-      continueBtn.style.display = "inline-block";
-    }
-  }, 1000);
+})();
 </script>
 
 </body>
 </html>
+
 
 
