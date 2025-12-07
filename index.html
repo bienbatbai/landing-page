@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Preparing your video…</title>
+  <title>Loading your video…</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 0;
-      background: #111111;
+      background: #000000;
       color: #ffffff;
       font-family: Arial, sans-serif;
       height: 100vh;
@@ -17,55 +21,73 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      font-size: 18px;
     }
+
     .spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid rgba(255, 255, 255, 0.2);
-      border-top-color: #ff0033;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.18);
+      border-top-color: #ff0033;
       animation: spin 0.8s linear infinite;
-      margin: 0 auto 15px;
+      margin: 0 auto 14px;
     }
+
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+
+    #msg {
+      font-size: 18px;
+      color: #e0e0e0;
     }
   </style>
 </head>
 <body>
 
-<div id="content">
+<div>
   <div class="spinner"></div>
-  <div id="msg">Preparing your video…</div>
+  <div id="msg">Loading your video…</div>
 </div>
 
 <script>
 (function () {
-  const params = new URLSearchParams(window.location.search);
-  let yt = params.get("v");
+  const url = new URL(window.location.href);
+  const params = url.searchParams;
 
-  // When you open /?v= (empty) → do NOT redirect (so you can copy the URL easily)
-  if (!yt) {
-    document.getElementById("msg").innerText =
-      "Please paste your YouTube link after ?v=";
+  // 1) Nếu KHÔNG có ?v= → tự thêm ?v= vào URL để bạn dễ dán link
+  if (!params.has("v")) {
+    url.search = "?v=";              // tạo ?v= trống
+    window.location.replace(url.toString());
     return;
   }
 
-  // If only video ID is provided → build full YouTube URL
+  // 2) Đến đây chắc chắn đã có ?v=
+  let yt = params.get("v");          // giá trị sau v=
+
+  // Nếu vẫn rỗng (chỉ /?v=) thì không redirect – chỉ để bạn thấy & cấu hình
+  if (!yt) {
+    document.getElementById("msg").innerText = "Video link is missing.";
+    return;
+  }
+
+  // Nếu bạn chỉ nhập ID → build thành URL YouTube đầy đủ
   if (!yt.startsWith("http")) {
     yt = "https://www.youtube.com/watch?v=" + yt;
   }
 
-  // Small delay to keep user for a moment, then redirect
-  setTimeout(() => {
+  // 3) Delay nhẹ cho user rồi redirect sang YouTube
+  const REDIRECT_DELAY = 700; // ms ~0.7s
+
+  setTimeout(function () {
     window.location.replace(yt);
-  }, 700);
+  }, REDIRECT_DELAY);
 })();
 </script>
 
 </body>
 </html>
+
 
 
 
