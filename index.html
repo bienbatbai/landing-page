@@ -1,206 +1,71 @@
-
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Đang chuẩn bị video của bạn…</title>
+  <title>Preparing your video…</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle at top, #ff0040 0, #0b0b0f 45%, #000000 100%);
+      background: #111111;
       color: #ffffff;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
-    }
-
-    .wrap {
-      width: 100%;
-      max-width: 420px;
-      padding: 16px;
-    }
-
-    .card {
-      background: rgba(15, 15, 20, 0.96);
-      border-radius: 20px;
-      padding: 22px 20px 26px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+      align-items: center;
       text-align: center;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 18px;
     }
-
-    .title {
-      font-size: 19px;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      color: #c6c6c6;
-      margin-bottom: 18px;
-    }
-
     .spinner {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      border: 4px solid rgba(255, 255, 255, 0.15);
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
       border-top-color: #ff0033;
-      margin: 0 auto 16px;
-      animation: spin 0.9s linear infinite;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 15px;
     }
-
     @keyframes spin {
       to { transform: rotate(360deg); }
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
-      font-size: 11px;
-      margin-bottom: 10px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #3dff6c;
-      box-shadow: 0 0 8px #3dff6c;
-    }
-
-    .status {
-      font-size: 13px;
-      color: #b8b8b8;
-      margin-top: 4px;
-    }
-
-    .url-preview {
-      font-size: 11px;
-      color: #888;
-      margin-top: 10px;
-      word-break: break-all;
-    }
-
-    .btn-preview {
-      margin-top: 16px;
-      display: inline-block;
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      background: transparent;
-      color: #fff;
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    .error {
-      color: #ff8a8a;
-      font-size: 14px;
-      margin-top: 6px;
     }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <div class="pill">
-      <span class="dot"></span>
-      <span>Secure redirect • YouTube</span>
-    </div>
 
-    <div class="spinner"></div>
-
-    <div class="title">Đang chuẩn bị video cho bạn…</div>
-    <div class="subtitle" id="subtitle">
-      Vui lòng đợi trong giây lát. Bạn sẽ được chuyển sang YouTube tự động.
-    </div>
-
-    <div class="status" id="statusText">Đang kết nối tới máy chủ YouTube…</div>
-    <div class="url-preview" id="urlPreview"></div>
-
-    <!-- Nút xem trước khi ở chế độ debug -->
-    <button class="btn-preview" id="previewBtn" style="display:none;">
-      Mở video trong tab này
-    </button>
-
-    <div class="error" id="errorBox"></div>
-  </div>
+<div id="content">
+  <div class="spinner"></div>
+  <div id="msg">Preparing your video…</div>
 </div>
 
 <script>
-  (function () {
-    const params = new URLSearchParams(window.location.search);
-    let yt = params.get("v");          // link hoặc ID video
-    const debug = params.get("debug"); // debug=1 thì KHÔNG tự redirect
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  let yt = params.get("v");
 
-    const statusEl = document.getElementById("statusText");
-    const urlPreviewEl = document.getElementById("urlPreview");
-    const errorBox = document.getElementById("errorBox");
-    const previewBtn = document.getElementById("previewBtn");
-    const subtitleEl = document.getElementById("subtitle");
+  // When you open /?v= (empty) → do NOT redirect (so you can copy the URL easily)
+  if (!yt) {
+    document.getElementById("msg").innerText =
+      "Please paste your YouTube link after ?v=";
+    return;
+  }
 
-    if (!yt) {
-      errorBox.textContent = "Thiếu tham số ?v=LINK_VIDEO_YOUTUBE trong URL.";
-      statusEl.textContent = "Ví dụ: ?v=https://www.youtube.com/watch?v=XXXXXXXX";
-      return;
-    }
+  // If only video ID is provided → build full YouTube URL
+  if (!yt.startsWith("http")) {
+    yt = "https://www.youtube.com/watch?v=" + yt;
+  }
 
-    // Nếu chỉ nhập ID: ?v=XXXXXXXX
-    if (!yt.startsWith("http")) {
-      yt = "https://www.youtube.com/watch?v=" + yt;
-    }
-
-    // Hiển thị preview URL rút gọn cho user (chủ yếu bạn nhìn cho vui 😄)
-    const displayUrl = yt.length > 70 ? yt.slice(0, 70) + "..." : yt;
-    urlPreviewEl.textContent = "Video: " + displayUrl;
-
-    // Chế độ DEBUG: ?debug=1 => KHÔNG tự redirect, để bạn test
-    if (debug === "1") {
-      statusEl.textContent = "Chế độ xem thử (debug). Trang sẽ không tự chuyển.";
-      subtitleEl.textContent = "Nhấn nút bên dưới nếu bạn muốn mở video ngay.";
-      previewBtn.style.display = "inline-block";
-      previewBtn.addEventListener("click", function () {
-        window.location.href = yt;
-      });
-      return;
-    }
-
-    // Text động cho chuyên nghiệp
-    const messages = [
-      "Đang xác thực kết nối…",
-      "Đang đồng bộ với máy chủ YouTube…",
-      "Chuẩn bị mở video cho bạn…"
-    ];
-    let i = 0;
-    setInterval(function () {
-      statusEl.textContent = messages[i % messages.length];
-      i++;
-    }, 450);
-
-    // Delay nhỏ để giữ chân 1 chút rồi mới chuyển (0.7s)
-    const REDIRECT_DELAY = 700; // ms
-
-    setTimeout(function () {
-      window.location.replace(yt);
-    }, REDIRECT_DELAY);
-  })();
+  // Small delay to keep user for a moment, then redirect
+  setTimeout(() => {
+    window.location.replace(yt);
+  }, 700);
+})();
 </script>
+
 </body>
 </html>
+
+
 
