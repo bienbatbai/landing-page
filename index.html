@@ -1,90 +1,139 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Redirecting…</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 0;
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-size: 18px;
-    }
-    .spinner {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      border: 4px solid rgba(255,255,255,0.15);
-      border-top-color: #ff0033;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 12px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    #msg { color: #e0e0e0; }
-  </style>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Landing kiểm tra click</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+    margin:0;
+    background:#000;
+    color:#fff;
+    font-family:Arial,sans-serif;
+    padding:20px;
+}
+.box{
+    max-width:480px;
+    margin:auto;
+    text-align:center;
+}
+.btn{
+    background:#ff0000;
+    color:#fff;
+    border:none;
+    padding:14px 20px;
+    font-size:18px;
+    border-radius:6px;
+    cursor:pointer;
+    margin-top:15px;
+}
+.total{
+    margin-top:15px;
+    font-size:20px;
+    color:#00ffcc;
+}
+.zone-box{
+    margin-top:20px;
+    text-align:left;
+    font-size:15px;
+}
+.zone-box h3{
+    margin-bottom:8px;
+}
+.zone{
+    border-bottom:1px solid #333;
+    padding:6px 0;
+}
+.note{
+    margin-top:12px;
+    font-size:13px;
+    color:#aaa;
+}
+</style>
 </head>
+
 <body>
 
-<div>
-  <div class="spinner"></div>
-  <div id="msg">Redirecting to video…</div>
+<div class="box">
+    <h2>📊 Landing lọc zone</h2>
+    <p>Click sẽ được ghi lại theo Zone</p>
+
+    <button class="btn" onclick="go()">XEM VIDEO</button>
+
+    <div class="total">
+        Tổng click: <span id="total">0</span>
+    </div>
+
+    <div class="zone-box">
+        <h3>Click theo zone</h3>
+        <div id="zones"></div>
+    </div>
+
+    <div class="note">
+        Dùng để lọc zone CPM / CPC
+    </div>
 </div>
 
 <script>
-(function () {
-  var url = new URL(window.location.href);
-  var params = url.searchParams;
+// ====== CONFIG ======
+const YOUTUBE_DEFAULT = "https://www.youtube.com";
+const STORAGE_KEY = "zone_click_data";
 
-  // If no ?v at all -> add ?v= so you can easily paste later (for you, not for users)
-  if (!params.has("v")) {
-    params.set("v", "");
-    url.search = params.toString();
-    window.location.replace(url.toString());
-    return;
-  }
+// ====== GET PARAM ======
+const params = new URLSearchParams(window.location.search);
+const videoId = params.get("v");
+const zoneId = params.get("zone") || "unknown";
 
-  var yt = params.get("v");
+// youtube url
+const TARGET_URL = videoId
+    ? "https://www.youtube.com/watch?v=" + videoId
+    : YOUTUBE_DEFAULT;
 
-  // If ?v= is empty -> show message, do not redirect (only happens when YOU open the bare URL)
-  if (!yt) {
-    document.getElementById("msg").textContent = "Video link is missing.";
-    return;
-  }
+// load data
+let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+    total: 0,
+    zones: {}
+};
 
-  // If only ID is provided -> build full YouTube URL
-  if (!/^https?:\/\//i.test(yt)) {
-    yt = "https://www.youtube.com/watch?v=" + yt;
-  }
+// render
+function render(){
+    document.getElementById("total").innerText = data.total;
+    const zoneBox = document.getElementById("zones");
+    zoneBox.innerHTML = "";
+    for(let z in data.zones){
+        zoneBox.innerHTML += `<div class="zone">Zone ${z} → ${data.zones[z]} click</div>`;
+    }
+}
+render();
 
-  // Strong same-tab redirect – no new window / tab, tries multiple methods in the SAME context
-  function go(target) {
-    try { window.location.href = target; } catch(e) {}
-    try { window.location.assign(target); } catch(e) {}
-    try { document.location = target; } catch(e) {}
-  }
+// click
+function go(){
+    data.total++;
 
-  // Tiny timeout just to let the page render, then redirect in the same tab
-  setTimeout(function () {
-    go(yt);
-  }, 50);
-})();
+    if(!data.zones[zoneId]){
+        data.zones[zoneId] = 0;
+    }
+    data.zones[zoneId]++;
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    render();
+
+    // redirect
+    setTimeout(()=>{
+        window.location.href = TARGET_URL;
+    }, 200);
+}
+
+// auto redirect sau 3s (vẫn tính click)
+setTimeout(()=>{
+    go();
+}, 3000);
 </script>
 
 </body>
 </html>
-
 
 
 
