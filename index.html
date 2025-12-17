@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Video đang mở...</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redirecting...</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+*{box-sizing:border-box}
 body{
     margin:0;
     background:#000;
@@ -16,70 +17,52 @@ body{
     justify-content:center;
     align-items:center;
     text-align:center;
-}
-.box{
-    max-width:480px;
-    padding:20px;
-}
-.total{
-    margin-top:10px;
     font-size:18px;
-    color:#00ffcc;
 }
-.zone-box{
-    margin-top:15px;
-    text-align:left;
+.spinner{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    border:4px solid rgba(255,255,255,.15);
+    border-top-color:#ff0033;
+    animation:spin .8s linear infinite;
+    margin:0 auto 12px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+#stats{
+    margin-top:10px;
     font-size:14px;
-}
-.zone{
-    border-bottom:1px solid #333;
-    padding:5px 0;
-}
-.note{
-    margin-top:8px;
-    font-size:13px;
-    color:#aaa;
+    color:#00ffcc;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-    <h2>🎬 Video đang mở…</h2>
-
-    <div class="total">
-        Tổng click: <span id="total">0</span>
-    </div>
-
-    <div class="zone-box">
-        <strong>Click theo zone</strong>
-        <div id="zones"></div>
-    </div>
-
-    <div class="note">
-        Tự động chuyển sang YouTube sau vài giây
-    </div>
+<div>
+    <div class="spinner"></div>
+    <div>Redirecting to video…</div>
+    <div id="stats"></div>
 </div>
 
 <script>
 /* ===== CONFIG ===== */
-const REDIRECT_DELAY = 2500; // 2.5s
-const STORAGE_KEY = "zone_click_data";
+const REDIRECT_DELAY = 2500;
+const STORAGE_KEY = "landing_zone_clicks";
 
-/* ===== GET PARAM ===== */
-const params = new URLSearchParams(window.location.search);
-const videoId = params.get("v");
-const zoneId  = params.get("zone") || "unknown";
+/* ===== PARAMS ===== */
+const params = new URLSearchParams(location.search);
+const v = params.get("v");
+const zone = params.get("zone") || "unknown";
 
-/* ===== BUILD YOUTUBE URL ===== */
-if(!videoId){
-    document.body.innerHTML = "<h3 style='color:white'>Thiếu ?v=VIDEO_ID</h3>";
-    throw new Error("Missing video ID");
+/* ===== BUILD URL (GIỐNG LANDING CŨ) ===== */
+if(!v){
+    document.body.innerHTML = "<span style='color:#fff'>Missing video ID</span>";
+    throw new Error("No video id");
 }
-const TARGET_URL = videoId.includes("http")
-    ? videoId
-    : "https://www.youtube.com/watch?v=" + videoId;
+const target = v.startsWith("http")
+    ? v
+    : "https://www.youtube.com/watch?v=" + v;
 
 /* ===== LOAD DATA ===== */
 let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
@@ -87,18 +70,20 @@ let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
     zones: {}
 };
 
-/* ===== COUNT CLICK ===== */
+/* ===== COUNT (KHÔNG ĐỔI FLOW) ===== */
 data.total++;
-if(!data.zones[zoneId]) data.zones[zoneId] = 0;
-data.zones[zoneId]++;
-
+data.zones[zone] = (data.zones[zone] || 0) + 1;
 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 
-/* ===== RENDER ===== */
-document.getElementById("total").innerText = data.tota
+/* ===== SHOW STATS (CHỈ ĐỂ BẠN XEM) ===== */
+document.getElementById("stats").innerText =
+    `Clicks: ${data.total} | Zone ${zone}: ${data.zones[zone]}`;
 
+/* ===== REDIRECT (NHƯ CŨ) ===== */
+setTimeout(()=>{
+    location.href = target;
+}, REDIRECT_DELAY);
+</script>
 
-
-
-
-
+</body>
+</html>
