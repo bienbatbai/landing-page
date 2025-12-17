@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Landing chạy view</title>
+<title>Video đang mở...</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -11,47 +11,32 @@ body{
     background:#000;
     color:#fff;
     font-family:Arial,sans-serif;
-    padding:20px;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
 }
 .box{
     max-width:480px;
-    margin:auto;
-    text-align:center;
-}
-input{
-    width:100%;
-    padding:12px;
-    font-size:16px;
-    border-radius:6px;
-    border:none;
-    margin-top:10px;
-}
-.btn{
-    background:#ff0000;
-    color:#fff;
-    border:none;
-    padding:14px 20px;
-    font-size:18px;
-    border-radius:6px;
-    cursor:pointer;
-    margin-top:15px;
+    padding:20px;
 }
 .total{
-    margin-top:15px;
-    font-size:20px;
+    margin-top:10px;
+    font-size:18px;
     color:#00ffcc;
 }
 .zone-box{
-    margin-top:20px;
+    margin-top:15px;
     text-align:left;
-    font-size:15px;
+    font-size:14px;
 }
 .zone{
     border-bottom:1px solid #333;
-    padding:6px 0;
+    padding:5px 0;
 }
 .note{
-    margin-top:12px;
+    margin-top:8px;
     font-size:13px;
     color:#aaa;
 }
@@ -63,14 +48,12 @@ input{
 <div class="box">
     <h2>🎬 Video đang mở…</h2>
 
-    <input id="videoInput" placeholder="Dán ID hoặc link YouTube">
-
     <div class="total">
         Tổng click: <span id="total">0</span>
     </div>
 
     <div class="zone-box">
-        <h3>Click theo zone</h3>
+        <strong>Click theo zone</strong>
         <div id="zones"></div>
     </div>
 
@@ -81,12 +64,22 @@ input{
 
 <script>
 /* ===== CONFIG ===== */
-const REDIRECT_DELAY = 2500; // 2.5 giây
+const REDIRECT_DELAY = 2500; // 2.5s
 const STORAGE_KEY = "zone_click_data";
 
 /* ===== GET PARAM ===== */
 const params = new URLSearchParams(window.location.search);
-const zoneId = params.get("zone") || "unknown";
+const videoId = params.get("v");
+const zoneId  = params.get("zone") || "unknown";
+
+/* ===== BUILD YOUTUBE URL ===== */
+if(!videoId){
+    document.body.innerHTML = "<h3 style='color:white'>Thiếu ?v=VIDEO_ID</h3>";
+    throw new Error("Missing video ID");
+}
+const TARGET_URL = videoId.includes("http")
+    ? videoId
+    : "https://www.youtube.com/watch?v=" + videoId;
 
 /* ===== LOAD DATA ===== */
 let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
@@ -94,48 +87,16 @@ let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
     zones: {}
 };
 
+/* ===== COUNT CLICK ===== */
+data.total++;
+if(!data.zones[zoneId]) data.zones[zoneId] = 0;
+data.zones[zoneId]++;
+
+localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
 /* ===== RENDER ===== */
-function render(){
-    document.getElementById("total").innerText = data.total;
-    const z = document.getElementById("zones");
-    z.innerHTML = "";
-    for(let k in data.zones){
-        z.innerHTML += `<div class="zone">Zone ${k} → ${data.zones[k]} click</div>`;
-    }
-}
-render();
+document.getElementById("total").innerText = data.tota
 
-/* ===== BUILD YOUTUBE URL ===== */
-function buildYoutubeUrl(input){
-    if(!input) return null;
-    if(input.includes("youtube.com") || input.includes("youtu.be")){
-        return input;
-    }
-    return "https://www.youtube.com/watch?v=" + input;
-}
-
-/* ===== AUTO CLICK + REDIRECT ===== */
-setTimeout(() => {
-    const input = document.getElementById("videoInput").value.trim();
-    const target = buildYoutubeUrl(input);
-    if(!target) return;
-
-    // ghi click
-    data.total++;
-    if(!data.zones[zoneId]) data.zones[zoneId] = 0;
-    data.zones[zoneId]++;
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    render();
-
-    // redirect
-    window.location.href = target;
-
-}, REDIRECT_DELAY);
-</script>
-
-</body>
-</html>
 
 
 
