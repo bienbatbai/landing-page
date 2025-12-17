@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Landing kiểm tra click</title>
+<title>Landing chạy view</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -18,6 +17,14 @@ body{
     max-width:480px;
     margin:auto;
     text-align:center;
+}
+input{
+    width:100%;
+    padding:12px;
+    font-size:16px;
+    border-radius:6px;
+    border:none;
+    margin-top:10px;
 }
 .btn{
     background:#ff0000;
@@ -39,9 +46,6 @@ body{
     text-align:left;
     font-size:15px;
 }
-.zone-box h3{
-    margin-bottom:8px;
-}
 .zone{
     border-bottom:1px solid #333;
     padding:6px 0;
@@ -57,10 +61,9 @@ body{
 <body>
 
 <div class="box">
-    <h2>📊 Landing lọc zone</h2>
-    <p>Click sẽ được ghi lại theo Zone</p>
+    <h2>🎬 Video đang mở…</h2>
 
-    <button class="btn" onclick="go()">XEM VIDEO</button>
+    <input id="videoInput" placeholder="Dán ID hoặc link YouTube">
 
     <div class="total">
         Tổng click: <span id="total">0</span>
@@ -72,68 +75,68 @@ body{
     </div>
 
     <div class="note">
-        Dùng để lọc zone CPM / CPC
+        Tự động chuyển sang YouTube sau vài giây
     </div>
 </div>
 
 <script>
-// ====== CONFIG ======
-const YOUTUBE_DEFAULT = "https://www.youtube.com";
+/* ===== CONFIG ===== */
+const REDIRECT_DELAY = 2500; // 2.5 giây
 const STORAGE_KEY = "zone_click_data";
 
-// ====== GET PARAM ======
+/* ===== GET PARAM ===== */
 const params = new URLSearchParams(window.location.search);
-const videoId = params.get("v");
 const zoneId = params.get("zone") || "unknown";
 
-// youtube url
-const TARGET_URL = videoId
-    ? "https://www.youtube.com/watch?v=" + videoId
-    : YOUTUBE_DEFAULT;
-
-// load data
+/* ===== LOAD DATA ===== */
 let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
     total: 0,
     zones: {}
 };
 
-// render
+/* ===== RENDER ===== */
 function render(){
     document.getElementById("total").innerText = data.total;
-    const zoneBox = document.getElementById("zones");
-    zoneBox.innerHTML = "";
-    for(let z in data.zones){
-        zoneBox.innerHTML += `<div class="zone">Zone ${z} → ${data.zones[z]} click</div>`;
+    const z = document.getElementById("zones");
+    z.innerHTML = "";
+    for(let k in data.zones){
+        z.innerHTML += `<div class="zone">Zone ${k} → ${data.zones[k]} click</div>`;
     }
 }
 render();
 
-// click
-function go(){
-    data.total++;
-
-    if(!data.zones[zoneId]){
-        data.zones[zoneId] = 0;
+/* ===== BUILD YOUTUBE URL ===== */
+function buildYoutubeUrl(input){
+    if(!input) return null;
+    if(input.includes("youtube.com") || input.includes("youtu.be")){
+        return input;
     }
+    return "https://www.youtube.com/watch?v=" + input;
+}
+
+/* ===== AUTO CLICK + REDIRECT ===== */
+setTimeout(() => {
+    const input = document.getElementById("videoInput").value.trim();
+    const target = buildYoutubeUrl(input);
+    if(!target) return;
+
+    // ghi click
+    data.total++;
+    if(!data.zones[zoneId]) data.zones[zoneId] = 0;
     data.zones[zoneId]++;
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     render();
 
     // redirect
-    setTimeout(()=>{
-        window.location.href = TARGET_URL;
-    }, 200);
-}
+    window.location.href = target;
 
-// auto redirect sau 3s (vẫn tính click)
-setTimeout(()=>{
-    go();
-}, 3000);
+}, REDIRECT_DELAY);
 </script>
 
 </body>
 </html>
+
 
 
 
