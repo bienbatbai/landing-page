@@ -1,62 +1,48 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Redirecting...</title>
+<title>Loading…</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body{
-  margin:0;
-  background:#000;
-  color:#fff;
-  font-family:Arial;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-</style>
 </head>
-<body>
 
-<div>Redirecting to video…</div>
-
+<body style="margin:0;background:#000;color:#fff;
+display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial">
+Loading…
 <script>
-/* ===== LẤY PARAM ===== */
-const p = new URLSearchParams(location.search);
-const v = p.get("v");
-const zone = p.get("zone") || "unknown";
-const ua = navigator.userAgent;
+/* ===== CONFIG ===== */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec";
+const REDIRECT_DELAY = 500;
 
-/* ===== CHECK VIDEO ===== */
-if(!v){
-  document.body.innerHTML = "Missing video ID";
+/* ===== PARAMS ===== */
+const p = new URLSearchParams(location.search);
+const video = p.get("v");
+const zone  = p.get("zone") || "unknown";
+
+/* ===== BUILD VIDEO URL ===== */
+if (!video) {
+  document.body.innerText = "Missing video ID";
   throw new Error("No video");
 }
 
-/* ===== LINK YOUTUBE ===== */
-const yt = v.startsWith("http")
-  ? v
-  : "https://www.youtube.com/watch?v=" + v;
+const yt = video.startsWith("http")
+  ? video
+  : "https://www.youtube.com/watch?v=" + video;
 
-/* ===== GỬI CLICK VỀ GOOGLE SHEET ===== */
-fetch("https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec",{
-  method:"POST",
-  mode:"no-cors",
-  headers:{ "Content-Type":"application/json" },
-  body: JSON.stringify({
-    zone: zone,
-    video: yt,
-    ua: ua,
-    time: new Date().toISOString()
-  })
+/* ===== SEND LOG ===== */
+const data = new URLSearchParams({
+  zone: zone,
+  video: yt,
+  ua: navigator.userAgent,
+  time: Date.now()
 });
 
-/* ===== NHẢY YOUTUBE NGAY ===== */
-setTimeout(()=>{
-  location.href = yt;
-}, 500);
-</script>
+fetch(SCRIPT_URL + "?" + data.toString()).catch(()=>{});
 
+/* ===== REDIRECT ===== */
+setTimeout(() => {
+  location.replace(yt);
+}, REDIRECT_DELAY);
+</script>
 </body>
 </html>
