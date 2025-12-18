@@ -14,50 +14,44 @@ html,body{
   align-items:center;
   justify-content:center;
   color:#fff;
-  font-family:Arial,sans-serif;
+  font-family:Arial
 }
 </style>
 </head>
-
 <body>
-<div>Redirecting…</div>
+
+<div>Redirecting to video…</div>
 
 <script>
-/* ====== LẤY PARAM ====== */
-const params = new URLSearchParams(window.location.search);
-const zone  = params.get("zone") || "unknown";
-const ua    = navigator.userAgent;
+const params = new URLSearchParams(location.search);
 
-/* ====== XỬ LÝ VIDEO ======
-   HỖ TRỢ CẢ:
-   - ?v=VIDEO_ID
-   - ?v=https://www.youtube.com/watch?v=...
-*/
-let v = params.get("v");
+// ===== PARAMS =====
+const v = params.get("v");                 // video id
+const zone = params.get("zone") || "none"; // zone
+const ua = navigator.userAgent;
+
+// ===== CHECK VIDEO =====
 if(!v){
-  document.body.innerText = "Missing video ID";
-  throw new Error("Missing video ID");
+  document.body.innerHTML = "Missing video ID";
+  throw new Error("No video ID");
 }
 
-let videoId = v;
-if(v.includes("youtube.com")){
-  const u = new URL(v);
-  videoId = u.searchParams.get("v");
-}
+// ===== BUILD YT URL =====
+const yt = v.startsWith("http")
+  ? v
+  : "https://www.youtube.com/watch?v=" + v;
 
-const ytUrl = "https://www.youtube.com/watch?v=" + videoId;
-
-/* ====== GỬI CLICK + ZONE VỀ GOOGLE SHEET ====== */
+// ===== SEND CLICK TO GOOGLE SHEET =====
 fetch(
-  "https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec" +
-  "?zone=" + encodeURIComponent(zone) +
-  "&video=" + encodeURIComponent(videoId) +
-  "&ua=" + encodeURIComponent(ua)
-).catch(()=>{});
+  "https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec"
+  + "?zone=" + encodeURIComponent(zone)
+  + "&video=" + encodeURIComponent(v)
+  + "&ua=" + encodeURIComponent(ua)
+);
 
-/* ====== NHẢY SANG YOUTUBE NGAY ====== */
+// ===== REDIRECT IMMEDIATELY =====
 setTimeout(()=>{
-  window.location.replace(ytUrl);
+  location.replace(yt);
 }, 300);
 </script>
 
