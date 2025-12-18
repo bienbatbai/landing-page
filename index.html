@@ -2,69 +2,67 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Redirecting…</title>
+<title>Redirecting...</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{
   margin:0;
   background:#000;
   color:#fff;
+  font-family:Arial,sans-serif;
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  font-family:Arial,sans-serif;
+  text-align:center;
 }
 .spinner{
-  width:48px;
-  height:48px;
+  width:46px;
+  height:46px;
+  border-radius:50%;
   border:4px solid rgba(255,255,255,.2);
   border-top-color:#ff0033;
-  border-radius:50%;
   animation:spin .8s linear infinite;
+  margin:0 auto 12px;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 
 <body>
-<div class="spinner"></div>
+<div>
+  <div class="spinner"></div>
+  <div>Opening video…</div>
+</div>
 
 <script>
-/* ====== CONFIG ====== */
-const LOG_URL = "https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec";
-const REDIRECT_DELAY = 2000;
-
-/* ====== GET PARAMS ====== */
 const params = new URLSearchParams(window.location.search);
-const v = params.get("v");
-const zone = params.get("zone") || "unknown";
-const ua = navigator.userAgent;
 
-/* ====== CHECK VIDEO ====== */
+// ==== BẮT THAM SỐ ====
+const v    = params.get("v");              // video id
+const zone = params.get("zone") || "none"; // zone id
+
 if(!v){
-  document.body.innerHTML = "<h3 style='color:white'>Missing video ID</h3>";
+  document.body.innerHTML = "Missing video ID";
   throw new Error("Missing video ID");
 }
 
-/* ====== BUILD YOUTUBE URL (CHUẨN – KHÔNG LỖI) ====== */
-let ytUrl = "";
-if(v.startsWith("http")){
-  ytUrl = v;
-}else{
-  ytUrl = "https://www.youtube.com/watch?v=" + v.trim();
-}
+// ==== LINK YOUTUBE CHUẨN (KHÔNG LỖI) ====
+const yt = v.startsWith("http")
+  ? v
+  : "https://www.youtube.com/watch?v=" + v;
 
-/* ====== LOG TO GOOGLE SHEET ====== */
-fetch(LOG_URL + "?zone=" + encodeURIComponent(zone)
-      + "&video=" + encodeURIComponent(v)
-      + "&ua=" + encodeURIComponent(ua))
-.catch(()=>{});
+// ==== GỬI ZONE VỀ GOOGLE SHEET (BẠN ĐÃ TẠO) ====
+fetch(
+  "https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec"
+  + "?zone=" + encodeURIComponent(zone)
+  + "&video=" + encodeURIComponent(v)
+).catch(()=>{});
 
-/* ====== REDIRECT ====== */
+// ==== REDIRECT ====
 setTimeout(()=>{
-  window.location.replace(ytUrl);
-}, REDIRECT_DELAY);
+  window.location.href = yt;
+}, 2000);
 </script>
 
 </body>
