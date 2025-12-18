@@ -1,59 +1,64 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Redirecting…</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    background:#000;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:Arial,sans-serif;
+  margin:0;
+  width:100%;
+  height:100%;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-family:Arial,sans-serif;
 }
 </style>
 </head>
-<body>
 
-<div>Loading…</div>
+<body>
+<div>Redirecting…</div>
 
 <script>
-/* ========= CONFIG ========= */
-const LOG_URL = "https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec";
-const REDIRECT_DELAY = 300;
-
-/* ========= PARAM ========= */
+/* ====== LẤY PARAM ====== */
 const params = new URLSearchParams(window.location.search);
+const zone  = params.get("zone") || "unknown";
+const ua    = navigator.userAgent;
+
+/* ====== XỬ LÝ VIDEO ======
+   HỖ TRỢ CẢ:
+   - ?v=VIDEO_ID
+   - ?v=https://www.youtube.com/watch?v=...
+*/
 let v = params.get("v");
-const zone = params.get("zone") || "unknown";
-
-/* ========= BUILD YT URL ========= */
-let yt = "";
-
 if(!v){
-    document.body.innerHTML = "Missing video parameter";
-    throw new Error("Missing v");
+  document.body.innerText = "Missing video ID";
+  throw new Error("Missing video ID");
 }
 
-if(v.startsWith("http")){
-    yt = v;
-}else{
-    yt = "https://www.youtube.com/watch?v=" + v;
+let videoId = v;
+if(v.includes("youtube.com")){
+  const u = new URL(v);
+  videoId = u.searchParams.get("v");
 }
 
-/* ========= LOG CLICK ========= */
-fetch(LOG_URL + "?zone=" + encodeURIComponent(zone) + "&video=" + encodeURIComponent(v))
-.catch(()=>{});
+const ytUrl = "https://www.youtube.com/watch?v=" + videoId;
 
-/* ========= REDIRECT ========= */
+/* ====== GỬI CLICK + ZONE VỀ GOOGLE SHEET ====== */
+fetch(
+  "https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec" +
+  "?zone=" + encodeURIComponent(zone) +
+  "&video=" + encodeURIComponent(videoId) +
+  "&ua=" + encodeURIComponent(ua)
+).catch(()=>{});
+
+/* ====== NHẢY SANG YOUTUBE NGAY ====== */
 setTimeout(()=>{
-    window.location.replace(yt);
-}, REDIRECT_DELAY);
+  window.location.replace(ytUrl);
+}, 300);
 </script>
 
 </body>
