@@ -2,88 +2,56 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Redirecting...</title>
+<title>Redirecting…</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-*{box-sizing:border-box}
 body{
-    margin:0;
-    background:#000;
-    color:#fff;
-    font-family:Arial,sans-serif;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    font-size:18px;
+  margin:0;
+  background:#000;
+  color:#fff;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Arial;
 }
 .spinner{
-    width:46px;
-    height:46px;
-    border-radius:50%;
-    border:4px solid rgba(255,255,255,.15);
-    border-top-color:#ff0033;
-    animation:spin .8s linear infinite;
-    margin:0 auto 12px;
+  width:40px;height:40px;
+  border:4px solid rgba(255,255,255,.2);
+  border-top-color:#ff0033;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-#stats{
-    margin-top:10px;
-    font-size:14px;
-    color:#00ffcc;
-}
 </style>
 </head>
-
 <body>
 
-<div>
-    <div class="spinner"></div>
-    <div>Redirecting to video…</div>
-    <div id="stats"></div>
-</div>
+<div class="spinner"></div>
 
 <script>
-/* ===== CONFIG ===== */
-const REDIRECT_DELAY = 2500;
-const STORAGE_KEY = "landing_zone_clicks";
-
-/* ===== PARAMS ===== */
 const params = new URLSearchParams(location.search);
 const v = params.get("v");
 const zone = params.get("zone") || "unknown";
 
-/* ===== BUILD URL (GIỐNG LANDING CŨ) ===== */
 if(!v){
-    document.body.innerHTML = "<span style='color:#fff'>Missing video ID</span>";
-    throw new Error("No video id");
+  document.body.innerHTML = "Missing video ID";
+  throw new Error("No video");
 }
-const target = v.startsWith("http")
-    ? v
-    : "https://www.youtube.com/watch?v=" + v;
 
-/* ===== LOAD DATA ===== */
-let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-    total: 0,
-    zones: {}
-};
+const yt = v.startsWith("http")
+  ? v
+  : "https://www.youtube.com/watch?v=" + v;
 
-/* ===== COUNT (KHÔNG ĐỔI FLOW) ===== */
-data.total++;
-data.zones[zone] = (data.zones[zone] || 0) + 1;
-localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+/* ===== GỬI ZONE RA SERVER ===== */
+fetch("https://YOUR-WORKER-URL/log?zone=" + zone);
 
-/* ===== SHOW STATS (CHỈ ĐỂ BẠN XEM) ===== */
-document.getElementById("stats").innerText =
-    `Clicks: ${data.total} | Zone ${zone}: ${data.zones[zone]}`;
-
-/* ===== REDIRECT (NHƯ CŨ) ===== */
+/* ===== REDIRECT ===== */
 setTimeout(()=>{
-    location.href = target;
-}, REDIRECT_DELAY);
+  location.href = yt;
+}, 2000);
 </script>
 
 </body>
 </html>
+
