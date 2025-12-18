@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Redirecting…</title>
+<title>Redirecting...</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body{
   margin:0;
   background:#000;
   color:#fff;
-  height:100vh;
   display:flex;
-  justify-content:center;
   align-items:center;
-  font-family:Arial;
+  justify-content:center;
+  height:100vh;
+  font-family:Arial,sans-serif;
 }
 .spinner{
   width:40px;height:40px;
@@ -25,8 +26,8 @@ body{
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
-<body>
 
+<body>
 <div class="spinner"></div>
 
 <script>
@@ -36,22 +37,24 @@ const zone = params.get("zone") || "unknown";
 
 if(!v){
   document.body.innerHTML = "Missing video ID";
-  throw new Error("No video");
+  throw new Error("No video ID");
 }
 
-const yt = v.startsWith("http")
+const target = v.startsWith("http")
   ? v
   : "https://www.youtube.com/watch?v=" + v;
 
-/* ===== GỬI ZONE RA SERVER ===== */
-fetch("https://YOUR-WORKER-URL/log?zone=" + zone);
+/* ===== GỬI ZONE RA GOOGLE SHEET ===== */
+fetch("https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec"
+  + "?zone=" + encodeURIComponent(zone)
+  + "&video=" + encodeURIComponent(v)
+);
 
 /* ===== REDIRECT ===== */
 setTimeout(()=>{
-  location.href = yt;
+  location.href = target;
 }, 2000);
 </script>
 
 </body>
 </html>
-
