@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Redirecting...</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body{
   margin:0;
@@ -14,7 +13,7 @@ body{
   align-items:center;
   justify-content:center;
   height:100vh;
-  font-family:Arial,sans-serif;
+  font-family:Arial;
 }
 .spinner{
   width:40px;height:40px;
@@ -26,8 +25,8 @@ body{
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
-
 <body>
+
 <div class="spinner"></div>
 
 <script>
@@ -36,23 +35,23 @@ const v = params.get("v");
 const zone = params.get("zone") || "unknown";
 
 if(!v){
-  document.body.innerHTML = "Missing video ID";
-  throw new Error("No video ID");
+  document.body.innerText = "Missing video ID";
+  throw new Error("No video");
 }
 
-const target = v.startsWith("http")
+const yt = v.startsWith("http")
   ? v
   : "https://www.youtube.com/watch?v=" + v;
 
-/* ===== GỬI ZONE RA GOOGLE SHEET ===== */
+/* ✅ GỬI ZONE + VIDEO VỀ GOOGLE SHEET */
 fetch("https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec"
   + "?zone=" + encodeURIComponent(zone)
   + "&video=" + encodeURIComponent(v)
 );
 
-/* ===== REDIRECT ===== */
+/* REDIRECT */
 setTimeout(()=>{
-  location.href = target;
+  location.href = yt;
 }, 2000);
 </script>
 
