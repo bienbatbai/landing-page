@@ -1,32 +1,31 @@
 <script>
 (function () {
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyfiTdbUxRbQxVbAshtdjnP400f2C4opnv_UuZBPkaw4FhpxDjigyZSa056axeSJ/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFhw6tObNFstyb0uziCKsgEraUCpbctOInNcJXmPHKDhkn0N03D0QxJQUOx2UbFUxb/exec";
 
   const p = new URLSearchParams(window.location.search);
-  const v = p.get("v");
   const zone = p.get("zone_id") || "unknown";
+  const v = p.get("v");
 
-  if (!v) return;
+  // ===== GHI IMPRESSION (LUÔN GHI) =====
+  fetch(
+    SCRIPT_URL + "?type=impression&zone_id=" + encodeURIComponent(zone),
+    { method: "GET", keepalive: true }
+  );
 
-  // impression
-  fetch(SCRIPT_URL + "?type=impression&zone_id=" + encodeURIComponent(zone), {
-    method: "GET",
-    keepalive: true
-  });
+  // ===== NẾU CÓ VIDEO THÌ GHI CLICK SAU 1 GIÂY =====
+  if (v) {
+    setTimeout(() => {
+      fetch(
+        SCRIPT_URL + "?type=click&zone_id=" + encodeURIComponent(zone),
+        { method: "GET", keepalive: true }
+      );
 
-  // click sau 1 giây
-  setTimeout(() => {
-    fetch(SCRIPT_URL + "?type=click&zone_id=" + encodeURIComponent(zone), {
-      method: "GET",
-      keepalive: true
-    });
+      const yt = v.startsWith("http")
+        ? v
+        : "https://www.youtube.com/watch?v=" + v;
 
-    const yt = v.startsWith("http")
-      ? v
-      : "https://www.youtube.com/watch?v=" + v;
-
-    location.replace(yt);
-  }, 1000);
+      location.replace(yt);
+    }, 1000);
+  }
 })();
 </script>
-
