@@ -1,18 +1,18 @@
 <script>
 (function () {
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFhw6tObNFstyb0uziCKsgEraUCpbctOInNcJXmPHKDhkn0N03D0QxJQUOx2UbFUxb/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1roT49lk-WBa50qywhWV--AESn0pwkDuNncabD3_4EGbiG6OGGBEMPNIJ7Y0OvY73/exec";
 
   const p = new URLSearchParams(window.location.search);
   const zone = p.get("zone_id") || "unknown";
   const v = p.get("v");
 
-  // ===== GHI IMPRESSION (LUÔN GHI) =====
+  // GHI IMPRESSION (LUÔN GHI)
   fetch(
     SCRIPT_URL + "?type=impression&zone_id=" + encodeURIComponent(zone),
     { method: "GET", keepalive: true }
   );
 
-  // ===== NẾU CÓ VIDEO THÌ GHI CLICK SAU 1 GIÂY =====
+  // GHI CLICK + REDIRECT (NẾU CÓ v)
   if (v) {
     setTimeout(() => {
       fetch(
