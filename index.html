@@ -1,30 +1,25 @@
 <script>
 (function () {
 
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlIAC8YgiLuOUQHyiKpY98rBT9XRW5L1FlUAN-qSc4_qT18ytNeIXAxRNHyHXc4_6g/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbze71Z1Gta8RjugjHRHnK6cvQ83sp9K-6QNoAa8xdjXVNnB7l35Rv_aThWYxtoK5_Yt/exec";
 
   const p = new URLSearchParams(location.search);
   const v = p.get("v");
-  const zone = p.get("zone") || "unknown";
+  const zone = p.get("zone_id") || "unknown";
 
   if (!v) {
-    document.body.innerHTML = "Missing video ID";
+    document.body.innerText = "Missing video";
     return;
   }
+
+  new Image().src = 
+    SCRIPT_URL + "?zone_id=" + encodeURIComponent(zone);
 
   const yt = v.startsWith("http")
     ? v
     : "https://www.youtube.com/watch?v=" + v;
 
-  // 🔥 GỬI CLICK – KHÔNG CHỜ – KHÔNG CHẶN
-  navigator.sendBeacon(
-    SCRIPT_URL + "?zone=" + encodeURIComponent(zone)
-  );
-
-  // ⚡ NHẢY YOUTUBE CỰC NHANH
-  setTimeout(() => {
-    location.replace(yt);
-  }, 10);
+  location.replace(yt);
 
 })();
 </script>
