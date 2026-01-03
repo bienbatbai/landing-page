@@ -1,43 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Redirecting...</title>
-</head>
-<body>
-
 <script>
 (function () {
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdjivdq4qzPk3jxGiOS-qU-zC-Tzh_aqOgngMVWevCw6nh52swyk9vaKsmGH0bxpgz/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRyfiTdbUxRbQxVbAshtdjnP400f2C4opnv_UuZBPkaw4FhpxDjigyZSa056axeSJ/exec";
 
   const p = new URLSearchParams(window.location.search);
   const v = p.get("v");
   const zone = p.get("zone_id") || "unknown";
 
-  if (!v) {
-    document.body.innerText = "Missing video id";
-    return;
-  }
+  if (!v) return;
 
-  // GỬI CLICK (KHÔNG BỊ HUỶ)
-  fetch(SCRIPT_URL + "?zone_id=" + encodeURIComponent(zone), {
+  // impression
+  fetch(SCRIPT_URL + "?type=impression&zone_id=" + encodeURIComponent(zone), {
     method: "GET",
     keepalive: true
   });
 
-  // DELAY ĐÚNG 1 GIÂY
+  // click sau 1 giây
   setTimeout(() => {
+    fetch(SCRIPT_URL + "?type=click&zone_id=" + encodeURIComponent(zone), {
+      method: "GET",
+      keepalive: true
+    });
+
     const yt = v.startsWith("http")
       ? v
       : "https://www.youtube.com/watch?v=" + v;
 
-    window.location.replace(yt);
+    location.replace(yt);
   }, 1000);
-
 })();
 </script>
-
-</body>
-</html>
-
 
