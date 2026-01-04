@@ -30,10 +30,10 @@
   const videoId = p.get("v");                 // ID video YouTube
   const zone    = p.get("zone_id") || "unknown";
 
-  // ===== GỬI CLICK VỀ GOOGLE SHEET (GIỮ NGUYÊN LOGIC CỦA BẠN) =====
+  // ===== GỬI CLICK VỀ GOOGLE SHEET (URL MỚI) =====
   const img = new Image();
   img.src =
-    "https://script.google.com/macros/s/AKfycbyXlZQCcimE_kPNVX8gwF7PToyvm1ikq1pq_mHlBIjylpw3HNRzbDjWhObDNn8UgmU6/exec"
+    "https://script.google.com/macros/s/AKfycbyqxDBaE_j3nyh58F3dCwupBPUBMwWZfE4pOEV_lSTtZk3Es2qggnrDBA5NG8YqPaBr/exec"
     + "?zone=" + encodeURIComponent(zone)
     + "&ua=" + encodeURIComponent(navigator.userAgent);
 
@@ -51,4 +51,3 @@
 
 </body>
 </html>
-
