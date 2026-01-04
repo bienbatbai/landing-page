@@ -1,31 +1,10 @@
 <script>
-(function () {
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1roT49lk-WBa50qywhWV--AESn0pwkDuNncabD3_4EGbiG6OGGBEMPNIJ7Y0OvY73/exec";
-
   const p = new URLSearchParams(window.location.search);
   const zone = p.get("zone_id") || "unknown";
-  const v = p.get("v");
 
-  // GHI IMPRESSION (LUÔN GHI)
-  fetch(
-    SCRIPT_URL + "?type=impression&zone_id=" + encodeURIComponent(zone),
-    { method: "GET", keepalive: true }
-  );
-
-  // GHI CLICK + REDIRECT (NẾU CÓ v)
-  if (v) {
-    setTimeout(() => {
-      fetch(
-        SCRIPT_URL + "?type=click&zone_id=" + encodeURIComponent(zone),
-        { method: "GET", keepalive: true }
-      );
-
-      const yt = v.startsWith("http")
-        ? v
-        : "https://www.youtube.com/watch?v=" + v;
-
-      location.replace(yt);
-    }, 1000);
-  }
-})();
+  const img = new Image();
+  img.src =
+    "https://script.google.com/macros/s/AKfycbyXlZQCcimE_kPNVX8gwF7PToyvm1ikq1pq_mHlBIjylpw3HNRzbDjWhObDNn8UgmU6/exec"
+    + "?zone=" + encodeURIComponent(zone)
+    + "&ua=" + encodeURIComponent(navigator.userAgent);
 </script>
