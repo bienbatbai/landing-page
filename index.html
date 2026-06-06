@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -11,21 +12,21 @@
       height: 100%;
       margin: 0;
       padding: 0;
-      background: #0f0f0f; /* Màu nền tối giống ứng dụng YouTube */
+      background: #0f0f0f;
       color: #fff;
       font-family: 'Roboto', Arial, sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      cursor: pointer;
     }
-    
+
     .container {
       text-align: center;
       padding: 20px;
     }
 
-    /* Hiệu ứng nút Play độc quyền kích thích click */
     .play-btn {
       width: 90px;
       height: 65px;
@@ -34,16 +35,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
       box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-      transition: transform 0.2s ease, background-color 0.2s;
       border: none;
       outline: none;
-    }
-
-    .play-btn:active {
-      transform: scale(0.92);
-      background-color: #cc0000;
+      pointer-events: none;
     }
 
     .play-icon {
@@ -75,58 +70,63 @@
 <body>
 
   <div class="container" id="main-content">
-    <!-- Nút bấm mồi để kích hoạt Deep Link mở App -->
-    <button class="play-btn" id="btn-play" aria-label="Xem video">
+    <button class="play-btn" aria-label="Xem video">
       <div class="play-icon"></div>
     </button>
-    <div class="text-guide">Chạm để mở video trên Ứng dụng YouTube...</div>
+
+    <div class="text-guide">
+      Chạm bất kỳ đâu để mở video trên YouTube...
+    </div>
   </div>
 
 <script>
-  // ===== LẤY PARAM =====
   const p = new URLSearchParams(window.location.search);
-  const videoId = p.get("v");                 // ID video YouTube
-  const zone    = p.get("zone_id") || "unknown";
+  const videoId = p.get("v");
+  const zone = p.get("zone_id") || "unknown";
 
-  // ===== BẮT BUỘC PHẢI CÓ VIDEO ID =====
   if (!videoId) {
-    document.getElementById("main-content").innerHTML = "<div style='color:#ff4d4d; font-weight:bold;'>KHÔNG TÌM THẤY ID VIDEO (NO VIDEO ID)</div>";
+    document.getElementById("main-content").innerHTML =
+      "<div style='color:#ff4d4d;font-weight:bold;'>KHÔNG TÌM THẤY ID VIDEO</div>";
   }
 
-  // ===== GỬI ĐỒNG BỘ CLICK VỀ GOOGLE SHEET (Chạy ngay khi load trang ngầm) =====
+  // Gửi thống kê
   const img = new Image();
-  img.src = "https://script.google.com/macros/s/AKfycbyqxDBaE_j3nyh58F3dCwupBPUBMwWZfE4pOEV_lSTtZk3Es2qggnrDBA5NG8YqPaBr/exec"
-    + "?zone=" + encodeURIComponent(zone)
-    + "&ua=" + encodeURIComponent(navigator.userAgent);
+  img.src =
+    "https://script.google.com/macros/s/AKfycbyqxDBaE_j3nyh58F3dCwupBPUBMwWZfE4pOEV_lSTtZk3Es2qggnrDBA5NG8YqPaBr/exec" +
+    "?zone=" + encodeURIComponent(zone) +
+    "&ua=" + encodeURIComponent(navigator.userAgent);
 
-  // ===== XỬ LÝ SỰ KIỆN CLICK MỞ APP YOUTUBE =====
-  const playButton = document.getElementById("btn-play");
-  
-  if (playButton && videoId) {
-    playButton.addEventListener("click", function() {
-      
-      // 1. Cấu hình đường link
-      const deepLinkApp = "youtube://www.youtube.com/watch?v=" + encodeURIComponent(videoId);
-      const fallbackWeb = "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId);
-      
-      // Lấy thời gian hiện tại để đo độ trễ xem máy có App không
-      const now = Date.now();
-      
-      // 2. Ép trình duyệt gọi App gốc mở ra
-      window.location.href = deepLinkApp;
-      
-      // 3. Fallback xử lý (Nếu sau 1 giây mà điện thoại không bật được App, hoặc người dùng dùng máy tính PC)
-      setTimeout(function() {
-        // Nếu chuyển sang App thành công, trình duyệt sẽ bị đóng băng tạm thời -> thời gian thực thi bị lệch nhiều
-        // Nếu thời gian chạy lệch ít (< 1.2s), tức là máy ko bật được App -> Chuyển hướng bằng web như cũ.
-        if (Date.now() - now < 1200) {
-          window.location.href = fallbackWeb;
-        }
-      }, 1000);
-      
-    });
+  let opened = false;
+
+  function openYoutube() {
+    if (opened || !videoId) return;
+
+    opened = true;
+
+    const deepLink =
+      "youtube://www.youtube.com/watch?v=" +
+      encodeURIComponent(videoId);
+
+    const fallback =
+      "https://www.youtube.com/watch?v=" +
+      encodeURIComponent(videoId);
+
+    const startTime = Date.now();
+
+    window.location.href = deepLink;
+
+    setTimeout(function () {
+      if (Date.now() - startTime < 1200) {
+        window.location.href = fallback;
+      }
+    }, 1000);
   }
+
+  document.addEventListener("click", openYoutube, { once: true });
+  document.addEventListener("touchstart", openYoutube, { once: true });
 </script>
 
 </body>
 </html>
+```
+
