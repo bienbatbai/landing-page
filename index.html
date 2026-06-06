@@ -1,27 +1,45 @@
-```javascript
-// ===== TỰ ĐỘNG MỞ YOUTUBE KHI VÀO TRANG =====
+```html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xem Video</title>
 
-if (videoId) {
-
-  const deepLinkApp =
-    "youtube://www.youtube.com/watch?v=" +
-    encodeURIComponent(videoId);
-
-  const fallbackWeb =
-    "https://www.youtube.com/watch?v=" +
-    encodeURIComponent(videoId);
-
-  const startTime = Date.now();
-
-  // Thử mở app YouTube ngay
-  window.location.href = deepLinkApp;
-
-  // Nếu không mở được app thì chuyển sang web
-  setTimeout(function () {
-    if (Date.now() - startTime < 1500) {
-      window.location.href = fallbackWeb;
-    }
-  }, 1200);
-
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#0f0f0f;
+  font-family:Arial,sans-serif;
 }
+a{
+  background:#ff0000;
+  color:white;
+  text-decoration:none;
+  padding:18px 30px;
+  border-radius:10px;
+  font-size:18px;
+}
+</style>
+</head>
+<body>
+
+<a id="openBtn" href="#">Mở Video YouTube</a>
+
+<script>
+const p = new URLSearchParams(location.search);
+const videoId = p.get("v");
+
+if(videoId){
+  document.getElementById("openBtn").href =
+    "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId);
+}
+</script>
+
+</body>
+</html>
 ```
