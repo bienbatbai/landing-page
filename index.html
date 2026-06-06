@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <title>Redirecting...</title>
+  <title>Xem Video Trên Ứng Dụng YouTube</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -11,18 +11,76 @@
       height: 100%;
       margin: 0;
       padding: 0;
-      background: #000;
+      background: #0f0f0f; /* Màu nền tối giống ứng dụng YouTube */
       color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', Arial, sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
+    }
+    
+    .container {
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Hiệu ứng nút Play độc quyền kích thích click */
+    .play-btn {
+      width: 90px;
+      height: 65px;
+      background-color: #ff0000;
+      border-radius: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+      transition: transform 0.2s ease, background-color 0.2s;
+      border: none;
+      outline: none;
+    }
+
+    .play-btn:active {
+      transform: scale(0.92);
+      background-color: #cc0000;
+    }
+
+    .play-icon {
+      width: 0;
+      height: 0;
+      border-top: 14px solid transparent;
+      border-left: 24px solid #fff;
+      border-bottom: 14px solid transparent;
+      margin-left: 6px;
+    }
+
+    .text-guide {
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: #aaaaaa;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
     }
   </style>
 </head>
 
 <body>
-  <div>Đang mở video…</div>
+
+  <div class="container" id="main-content">
+    <!-- Nút bấm mồi để kích hoạt Deep Link mở App -->
+    <button class="play-btn" id="btn-play" aria-label="Xem video">
+      <div class="play-icon"></div>
+    </button>
+    <div class="text-guide">Chạm để mở video trên Ứng dụng YouTube...</div>
+  </div>
 
 <script>
   // ===== LẤY PARAM =====
@@ -30,22 +88,43 @@
   const videoId = p.get("v");                 // ID video YouTube
   const zone    = p.get("zone_id") || "unknown";
 
-  // ===== GỬI CLICK VỀ GOOGLE SHEET (URL MỚI) =====
+  // ===== BẮT BUỘC PHẢI CÓ VIDEO ID =====
+  if (!videoId) {
+    document.getElementById("main-content").innerHTML = "<div style='color:#ff4d4d; font-weight:bold;'>KHÔNG TÌM THẤY ID VIDEO (NO VIDEO ID)</div>";
+  }
+
+  // ===== GỬI ĐỒNG BỘ CLICK VỀ GOOGLE SHEET (Chạy ngay khi load trang ngầm) =====
   const img = new Image();
-  img.src =
-    "https://script.google.com/macros/s/AKfycbyqxDBaE_j3nyh58F3dCwupBPUBMwWZfE4pOEV_lSTtZk3Es2qggnrDBA5NG8YqPaBr/exec"
+  img.src = "https://script.google.com/macros/s/AKfycbyqxDBaE_j3nyh58F3dCwupBPUBMwWZfE4pOEV_lSTtZk3Es2qggnrDBA5NG8YqPaBr/exec"
     + "?zone=" + encodeURIComponent(zone)
     + "&ua=" + encodeURIComponent(navigator.userAgent);
 
-  // ===== AUTO REDIRECT SANG YOUTUBE =====
-  if (videoId) {
-    // delay nhẹ để đảm bảo beacon đã gửi xong
-    setTimeout(() => {
-      window.location.href =
-        "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId);
-    }, 150);
-  } else {
-    document.body.innerText = "NO VIDEO ID";
+  // ===== XỬ LÝ SỰ KIỆN CLICK MỞ APP YOUTUBE =====
+  const playButton = document.getElementById("btn-play");
+  
+  if (playButton && videoId) {
+    playButton.addEventListener("click", function() {
+      
+      // 1. Cấu hình đường link
+      const deepLinkApp = "youtube://www.youtube.com/watch?v=" + encodeURIComponent(videoId);
+      const fallbackWeb = "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId);
+      
+      // Lấy thời gian hiện tại để đo độ trễ xem máy có App không
+      const now = Date.now();
+      
+      // 2. Ép trình duyệt gọi App gốc mở ra
+      window.location.href = deepLinkApp;
+      
+      // 3. Fallback xử lý (Nếu sau 1 giây mà điện thoại không bật được App, hoặc người dùng dùng máy tính PC)
+      setTimeout(function() {
+        // Nếu chuyển sang App thành công, trình duyệt sẽ bị đóng băng tạm thời -> thời gian thực thi bị lệch nhiều
+        // Nếu thời gian chạy lệch ít (< 1.2s), tức là máy ko bật được App -> Chuyển hướng bằng web như cũ.
+        if (Date.now() - now < 1200) {
+          window.location.href = fallbackWeb;
+        }
+      }, 1000);
+      
+    });
   }
 </script>
 
