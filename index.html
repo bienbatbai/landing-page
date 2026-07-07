@@ -9,23 +9,39 @@
 <script>
     (function() {
         const params = new URLSearchParams(window.location.search);
-        const videoId = params.get("v") || "dQw4w9WgXcQ"; // Thay ID mặc định nếu cần
-        const encodedId = encodeURIComponent(videoId);
-        
-        const androidIntent = "intent://www.youtube.com/watch?v=" + encodedId + "#Intent;scheme=https;package=com.google.android.youtube;end";
-        const webUrl = "https://www.youtube.com/watch?v=" + encodedId;
+        // Lấy nguyên link YouTube được truyền vào từ tham số ?url=
+        const rawYoutubeUrl = params.get("url"); 
 
-        // Ưu tiên cao nhất: Thử mở App ngay lập tức
-        if (/Android/i.test(navigator.userAgent)) {
-            window.location.href = androidIntent;
-            
-            // Backup siêu nhanh: Nếu sau 1 giây không vào được app, đẩy về web
-            setTimeout(function() {
+        // Hàm thông minh để bóc tách ID video từ mọi định dạng link YouTube
+        function getYoutubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        const videoId = getYoutubeId(rawYoutubeUrl);
+
+        if (videoId) {
+            const encodedId = encodeURIComponent(videoId);
+            const androidIntent = "intent://www.youtube.com/watch?v=" + encodedId + "#Intent;scheme=https;package=com.google.android.youtube;end";
+            const webUrl = "https://www.youtube.com/watch?v=" + encodedId;
+
+            // Thử mở App ngay lập tức nếu là Android
+            if (/Android/i.test(navigator.userAgent)) {
+                window.location.href = androidIntent;
+                
+                // Dự phòng siêu tốc: Nếu sau 1 giây không vào được app, đẩy về web
+                setTimeout(function() {
+                    window.location.replace(webUrl);
+                }, 1000);
+            } else {
+                // Các thiết bị khác (iOS, PC) đẩy thẳng ra web
                 window.location.replace(webUrl);
-            }, 1000);
+            }
         } else {
-            // Thiết bị không phải Android (iOS, PC)
-            window.location.replace(webUrl);
+            // Trường hợp link lỗi hoặc không có tham số url, đẩy về trang chủ YouTube làm backup an toàn
+            window.location.replace("https://www.youtube.com");
         }
     })();
 </script>
