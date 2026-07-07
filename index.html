@@ -1,45 +1,34 @@
-```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xem Video</title>
-
-<style>
-body{
-  margin:0;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#0f0f0f;
-  font-family:Arial,sans-serif;
-}
-a{
-  background:#ff0000;
-  color:white;
-  text-decoration:none;
-  padding:18px 30px;
-  border-radius:10px;
-  font-size:18px;
-}
-</style>
+<title>Loading...</title>
 </head>
 <body>
 
-<a id="openBtn" href="#">Mở Video YouTube</a>
-
 <script>
-const p = new URLSearchParams(location.search);
-const videoId = p.get("v");
+const params = new URLSearchParams(window.location.search);
+const videoId = params.get("v");
 
-if(videoId){
-  document.getElementById("openBtn").href =
-    "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId);
+if (videoId) {
+
+    // Mở app YouTube trên Android
+    location.replace(
+        "intent://www.youtube.com/watch?v=" + videoId +
+        "#Intent;scheme=https;package=com.google.android.youtube;end"
+    );
+
+    // Nếu không mở được app thì mở web
+    setTimeout(function () {
+        location.replace(
+            "https://www.youtube.com/watch?v=" +
+            encodeURIComponent(videoId)
+        );
+    }, 1200);
+
 }
 </script>
 
 </body>
 </html>
-```
